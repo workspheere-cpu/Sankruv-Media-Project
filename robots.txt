@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /src/
+Disallow: /content/
 
 Sitemap: https://www.sankruvmedia.com/sitemap.xml

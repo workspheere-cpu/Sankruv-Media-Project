@@ -1,0 +1,154 @@
+[
+  {
+    "key": "social",
+    "name": "Social Media Management",
+    "short": "Social media",
+    "file": "social-media-management.html",
+    "model": 5,
+    "h1": ["Social media management", "in Mumbai"],
+    "title": "Social Media Management Agency in Mumbai | Sankruv Media",
+    "meta": "Social media management in Mumbai by Sankruv Media: content strategy, posts, reels, stories, account management, influencer collaborations and monthly analytics reports.",
+    "summary": "Content creation, targeted strategy and brand storytelling across every major platform, planned monthly and measured every month.",
+    "overview": [
+      "Social media is often the first place a customer meets your brand. We plan, create and manage your presence across Instagram, Facebook, LinkedIn, YouTube and the other platforms your audience uses, so every post has a purpose and your brand looks and sounds the same everywhere.",
+      "Each month starts with a content plan built around your goals and ends with a report that shows what worked. In between, our team handles the writing, design and reels, so you can focus on running the business."
+    ],
+    "items": [
+      ["Content strategy and monthly planning", "We define your content pillars, posting rhythm and campaign moments, then map them into a monthly calendar before production begins."],
+      ["Posts, reels, stories and copywriting", "Designed posts, short-form video, stories and captions written in your brand voice, produced by one team so everything feels connected."],
+      ["Account management", "Day-to-day management of Instagram, Facebook, LinkedIn, YouTube and more, keeping every channel active, current and consistent."],
+      ["Influencer collaborations", "We identify creators who suit your brand, coordinate the collaboration and align their content with your campaign."],
+      ["Growth and engagement strategy", "Formats, timing and tactics guided by what your audience responds to, so reach and engagement grow over time."],
+      ["Monthly analytics and insight reports", "A clear report on reach, engagement and growth, with the insights that shape the next month's plan."]
+    ],
+    "best_for": "Brands that want a consistent, professional social presence without building an in-house content team.",
+    "outcomes": ["A content calendar planned a month ahead", "One recognisable look and voice on every platform", "Monthly numbers and insights instead of guesswork"],
+    "process": [
+      ["Audit", "We review your current profiles, audience and competitors to find what to keep, fix and build on."],
+      ["Plan", "We set content pillars and goals, then build a monthly calendar of posts, reels, stories and campaigns."],
+      ["Create and publish", "Our team designs, shoots, writes and schedules the content across your channels."],
+      ["Report", "Every month you receive analytics and insights, and the next plan improves on what performed best."]
+    ],
+    "faq": [
+      ["Which platforms do you manage?", "Instagram, Facebook, LinkedIn, YouTube and the other platforms your audience uses. We recommend the channels that best fit your brand and customers."],
+      ["Do you create the content as well?", "Yes. Our team plans, designs, shoots and writes the posts, reels, stories and captions, so you do not need separate vendors."],
+      ["How will I know it is working?", "You receive a monthly analytics and insight report covering reach, engagement and growth, with recommendations for the month ahead."],
+      ["How much does social media management cost?", "It depends on the number of platforms, the volume of content and your goals. Share your requirements and we will send a free quote."]
+    ]
+  },
+  {
+    "key": "web",
+    "name": "Web Development & Design",
+    "short": "Websites",
+    "file": "web-development-design.html",
+    "model": 2,
+    "h1": ["Website design and development", "in Mumbai"],
+    "title": "Website Design and Development Company in Mumbai | Sankruv Media",
+    "meta": "Website design and development in Mumbai by Sankruv Media: custom websites, UI/UX, Shopify and WooCommerce stores, landing pages, copywriting, speed optimisation and maintenance.",
+    "summary": "Responsive, high-performing websites, from portfolio and business sites to full eCommerce stores, built to turn visitors into enquiries.",
+    "overview": [
+      "Your website works for your brand around the clock. We design and build responsive, fast websites that explain what you do, build trust and make it easy for visitors to get in touch or buy.",
+      "From a portfolio or business site to a full online store on Shopify, WooCommerce or a custom platform, we handle design, development and copywriting, then keep the site secure and up to date after launch."
+    ],
+    "items": [
+      ["Custom website design and development", "A website designed around your brand and built from the ground up to work smoothly on every screen size."],
+      ["UI/UX design", "Page layouts and user journeys planned so visitors find what they need quickly and take the next step."],
+      ["Portfolio, business, agency and personal websites", "Sites that present your work, services and story clearly, with a route to contact you on every page."],
+      ["eCommerce stores", "Online stores on Shopify, WooCommerce or a custom platform, with product pages, cart and checkout ready to sell."],
+      ["Website copywriting", "Clear, persuasive copy for every page, written for your customers and structured for search engines."],
+      ["Landing pages for ad campaigns", "Focused pages built around a single campaign or offer, designed to turn ad clicks into enquiries."],
+      ["Speed optimisation", "Faster load times through optimised images, code and settings, for a better experience and stronger search visibility."],
+      ["Maintenance and security", "Updates, backups and security checks after launch, so your website stays reliable."]
+    ],
+    "best_for": "Businesses that need a website which looks premium, loads fast and brings in enquiries or sales.",
+    "outcomes": ["A responsive website that works on every device", "Clear pages that guide visitors to contact or buy", "Ongoing care so the site stays fast and secure"],
+    "process": [
+      ["Discover", "We agree goals, audience, pages and features, and plan the structure of the site."],
+      ["Design", "We design the key pages and user journeys for your review before development begins."],
+      ["Build", "We develop the site, add the content and test it across devices and browsers."],
+      ["Launch and support", "We take the site live and look after updates, speed and security afterwards."]
+    ],
+    "faq": [
+      ["Can you build an online store?", "Yes. We build eCommerce stores on Shopify, WooCommerce or a custom platform, depending on your products and plans."],
+      ["Do you write the website content?", "Yes. Website copywriting is part of our service, written for your customers and structured for search engines."],
+      ["Will my website work on mobile phones?", "Yes. Every website we build is responsive and designed to work on phones, tablets and desktops."],
+      ["Do you support the website after launch?", "Yes. We offer maintenance and security, along with speed optimisation, so your site stays reliable."]
+    ]
+  },
+  {
+    "key": "branding",
+    "name": "Branding & Creative Design",
+    "short": "Branding",
+    "file": "branding-creative-design.html",
+    "model": 3,
+    "h1": ["Branding and creative design", "in Mumbai"],
+    "title": "Branding and Creative Design Agency in Mumbai | Sankruv Media",
+    "meta": "Branding and creative design in Mumbai by Sankruv Media: logo and identity design, brand guidelines, packaging, print collateral, social media themes, ad creatives and pitch decks.",
+    "summary": "Logos, brand identity, packaging and marketing materials that tell your story and make your brand instantly recognisable.",
+    "overview": [
+      "A brand is more than a logo. It is the impression people carry every time they see your name. We build visual identities that express your story, values and purpose, and apply them consistently from packaging to social media.",
+      "Every identity comes with clear guidelines, so your team, printers and partners use your brand the same way everywhere it appears."
+    ],
+    "items": [
+      ["Logo and identity design", "A distinctive logo with supporting colours, typography and visual elements that work across print and digital."],
+      ["Brand guidelines", "A clear reference for your logo, colours, fonts and tone, so your brand stays consistent as it grows."],
+      ["Packaging design", "Packaging that stands out on the shelf and tells your story the moment a customer picks it up."],
+      ["Business cards, brochures and flyers", "Print collateral designed to match your identity and give customers something worth keeping."],
+      ["Social media brand themes", "Templates and visual systems for your social channels, so every post is instantly recognisable."],
+      ["Creative ad graphics", "Static and digital ad creatives designed to stop the scroll and support your campaign goals."],
+      ["Pitch decks and presentations", "Presentations that structure your story and help investors, clients and partners say yes."]
+    ],
+    "best_for": "New brands building an identity, and growing businesses that need their brand to look as good as their product.",
+    "outcomes": ["A distinctive identity your audience remembers", "Guidelines that keep every touchpoint consistent", "Ready-to-use files for print, packaging and digital"],
+    "process": [
+      ["Discover", "We learn about your business, audience, competitors and the personality your brand should carry."],
+      ["Concept", "We present creative directions for the identity and refine the one that fits best."],
+      ["Develop", "We build the full system: logo, colours, typography and the materials you need."],
+      ["Deliver", "You receive final files and brand guidelines, ready for your team and partners."]
+    ],
+    "faq": [
+      ["What is included in a brand identity?", "A brand identity typically includes your logo, colour palette, typography and visual elements, delivered with brand guidelines that show how to use them."],
+      ["Do you design packaging and print materials?", "Yes. We design packaging, business cards, brochures, flyers and other print collateral that match your identity."],
+      ["Can you design our pitch deck?", "Yes. We design pitch decks and presentations that structure your story and reflect your brand."],
+      ["How much does branding cost?", "It depends on the scope, from a logo to a complete identity with packaging and print. Share your needs and we will send a free quote."]
+    ]
+  },
+  {
+    "key": "shoots",
+    "name": "Corporate & Commercial Shoots",
+    "short": "Shoots",
+    "file": "corporate-commercial-shoots.html",
+    "model": 6,
+    "h1": ["Corporate and commercial shoots", "in Mumbai"],
+    "title": "Corporate and Commercial Photo and Video Shoots in Mumbai | Sankruv Media",
+    "meta": "Corporate and commercial photo and video shoots in Mumbai by Sankruv Media: product shoots, corporate profiles, promotional videos, event coverage, reels, ad films and fashion shoots.",
+    "summary": "Photo and video production for products, people, events and campaigns, planned, shot and edited by one team.",
+    "overview": [
+      "Strong visuals make a brand look premium before anyone reads a word. Our production team plans and shoots photo and video for products, people and events, ready for your website, social media and advertising.",
+      "We handle planning, the shoot and the edit, and deliver content in the formats each channel needs, from vertical reels to widescreen ad films."
+    ],
+    "items": [
+      ["Product photography and video", "Clean, detailed product visuals for eCommerce listings, catalogues, social media and ads."],
+      ["Corporate profile shoots", "Professional portraits and workplace photography that present your team and company with confidence."],
+      ["Promotional videos", "Brand and product videos that explain what you offer and why it matters."],
+      ["Event coverage", "Photo and video coverage of launches, conferences and brand events, edited for quick sharing."],
+      ["Reels and ad films", "Short-form vertical content and ad films made to perform on social platforms."],
+      ["Behind-the-scenes content", "Behind-the-scenes footage that shows the people and process behind your brand."],
+      ["Lifestyle and fashion shoots", "Styled shoots that place your products in real settings and help customers picture using them."]
+    ],
+    "best_for": "Brands that need premium photo and video for launches, eCommerce, social media and advertising.",
+    "outcomes": ["Premium visuals that lift every channel", "Edited content in the right format for each platform", "One shoot planned to produce many assets"],
+    "process": [
+      ["Brief", "We agree the goal, audience, channels and the shots or scenes you need."],
+      ["Plan", "We prepare the shot list, location, styling and schedule."],
+      ["Shoot", "Our team captures photo and video on the day, following the plan."],
+      ["Edit and deliver", "We edit, colour and finish the content and deliver it in the formats each channel needs."]
+    ],
+    "faq": [
+      ["What kinds of shoots do you handle?", "Product photography and video, corporate profile shoots, promotional videos, event coverage, reels, ad films, behind-the-scenes content, and lifestyle and fashion shoots."],
+      ["Do you edit the photos and videos as well?", "Yes. We edit and finish the content after the shoot, including video editing that makes your content stand out."],
+      ["Can you create content for reels and ads?", "Yes. We produce short-form vertical reels and ad films made for social platforms."],
+      ["How much does a shoot cost?", "It depends on the type of shoot, location, duration and deliverables. Share your brief and we will send a free quote."]
+    ]
+  }
+]

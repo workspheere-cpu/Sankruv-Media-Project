@@ -1,0 +1,73 @@
+[
+  {
+    "key": "havmor",
+    "name": "Havmor",
+    "mockup": "cam",
+    "tags": [
+      "shoots",
+      "social"
+    ],
+    "labels": [
+      "Commercial shoot",
+      "Digital marketing content"
+    ],
+    "location": "Virar, Mumbai",
+    "summary": "A commercial shoot at the Havmor ice cream parlour in Virar, Mumbai, creating content for the brand's digital marketing.",
+    "delivered": [
+      "On-location commercial shoot",
+      "Content for digital marketing"
+    ]
+  },
+  {
+    "key": "divine-trendz",
+    "name": "Divine Trendz",
+    "mockup": "posts",
+    "tags": [
+      "social",
+      "branding"
+    ],
+    "labels": [
+      "Social media creatives",
+      "Product promotion"
+    ],
+    "location": "",
+    "summary": "Promotional social media creatives for Divine Trendz's range of dining room products.",
+    "delivered": [
+      "Product promotion creatives",
+      "Social media designs"
+    ]
+  },
+  {
+    "key": "iijs-premiere-2021",
+    "name": "IIJS Premiere 2021",
+    "mockup": "card",
+    "tags": [
+      "branding"
+    ],
+    "labels": [
+      "Event invitation design"
+    ],
+    "location": "BIEC, Bengaluru",
+    "summary": "Invitation design for IIJS Premiere 2021, the jewellery show held at the Bangalore International Exhibition Centre (BIEC).",
+    "delivered": [
+      "Event invitation design"
+    ]
+  },
+  {
+    "key": "elevate-your-brand",
+    "name": "Elevate Your Brand",
+    "mockup": "phone",
+    "tags": [
+      "social"
+    ],
+    "labels": [
+      "Social media campaign"
+    ],
+    "location": "",
+    "summary": "A social media marketing campaign told through a series of branded creatives.",
+    "delivered": [
+      "Campaign creatives",
+      "Social media marketing"
+    ]
+  }
+]

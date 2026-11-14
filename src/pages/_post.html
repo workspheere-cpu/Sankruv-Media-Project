@@ -1,0 +1,56 @@
+<!--
+template: blog article, filled once per file in content/blog
+-->
+<article class="article">
+  <section class="ph post-hero" data-fx="3.1 0.7 0.7 0 0 0.5 {{p_model}}">
+    <div class="wrap narrow">
+      {{p_crumbs}}
+      <a class="pcat" href="blog.html?cat={{p_catkey}}">{{p_cat}}</a>
+      <h1 class="post-h1 sw">{{p_title}}</h1>
+      <p class="lead rv">{{p_desc}}</p>
+      <div class="byline rv">
+        <span class="avatar" aria-hidden="true">SM</span>
+        <span><b>Sankruv Media Team</b><span><time datetime="{{p_iso}}">{{p_date}}</time>, {{p_min}} min read</span></span>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap"><div class="post-cover tilt rv">{{p_cover}}</div></div>
+
+  <section class="post-body" data-fx="3.9 0.4 0.6 0 0 0.3 {{p_model}}">
+    <div class="wrap post-grid">
+      <aside class="toc">
+        <p>On this page</p>
+        <ol>{{p_toc}}</ol>
+        <div class="share"><p>Share this article</p><div>{{p_share}}</div></div>
+      </aside>
+      <div class="prose">
+{{p_body}}
+        <div class="author">
+          <span class="avatar" aria-hidden="true">SM</span>
+          <div><b>Written by the Sankruv Media Team</b><p>We are a digital marketing agency in Mumbai for social media, websites, branding and production. <a href="contact.html">Work with us</a>.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</article>
+
+<section class="latest" data-fx="3.2 0 0.7 0 0 0.45 5">
+  <div class="wrap">
+    <div class="sec-head row">
+      <h2 class="sw">Keep <span class="t">reading</span></h2>
+      <a class="link" href="blog.html">All articles{{arrow}}</a>
+    </div>
+    {{p_related}}
+  </div>
+</section>
+
+<section class="climax" data-fx="0 0 1.35 0.15 0 1 0" data-anchor=".climax-orb">
+  <div class="wrap">
+    <div class="climax-orb" aria-hidden="true"></div>
+    <h2 class="sw">Turn these ideas into <span class="t">results</span></h2>
+    <p class="lead rv">Tell us about your brand and we will send a plan and a free quote.</p>
+    {{picker}}
+    <div class="cta rv"><a class="btn hot" href="{{wa}}" target="_blank" rel="noopener"><span>WhatsApp us now</span>{{icon_wa}}</a><a class="btn ghost" href="contact.html"><span>Send a message</span>{{arrow}}</a></div>
+  </div>
+</section>
