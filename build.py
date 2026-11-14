@@ -59,6 +59,10 @@ ICON = {
  'in': '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10.5V17M8 7.2v.01M12 17v-3.6c0-1.7 1-2.9 2.5-2.9S17 11.7 17 13.4V17M12 10.5V17"/>',
  'x': '<path d="M4 4l16 16M20 4L4 20"/>',
  'search': '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
+ 'home': '<path d="M3.5 10.5L12 3.5l8.5 7V19a1.5 1.5 0 0 1-1.5 1.5h-4v-6h-6v6H5A1.5 1.5 0 0 1 3.5 19z"/>',
+ 'grid': '<rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="3.5"/>',
+ 'doc': '<path d="M6 3.5h8l4 4V20a.5.5 0 0 1-.5.5h-11A1.5 1.5 0 0 1 5 19V4.5A1 1 0 0 1 6 3.5z"/><path d="M9 11h6M9 15h6M9 7.5h3"/>',
+ 'send': '<path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/>',
 }
 def icon(k, cls='ic'):
     return f'<svg class="{cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{ICON[k]}</svg>'
@@ -259,7 +263,7 @@ def post_row(p, root):
     return (f'<li class="rv" data-cat="{slugify(p["category"])}" data-q="{esc((p["title"] + " " + p["description"]).lower())}">'
             f'<a class="prow" href="{root}blog/{p["slug"]}.html"><span class="pr-thumb">{cover(p)}</span><span class="pr-cat">{esc(p["category"])}</span>'
             f'<span class="pr-main"><span class="pr-t">{esc(p["title"])}</span><span class="pr-d">{esc(p["description"])}</span></span>'
-            f'<span class="pr-m">{fmt_date(p["date"])}<br>{p["minutes"]} min read</span>{ARROW}</a></li>')
+            f'<span class="pr-m"><span>{fmt_date(p["date"])}</span><span>{p["minutes"]} min read</span></span>{ARROW}</a></li>')
 
 # ------------------------------------------------------------------ head data
 ORG = {"@type": "ProfessionalService", "@id": BASE + "#org", "name": SITE['name'], "url": BASE, "logo": BASE + "assets/img/logo.png",
@@ -293,6 +297,7 @@ def header(active, root):
     mob_s = ''.join(f'<a href="{root}{s["file"]}">{esc(s["name"])}</a>' for s in SERVICES)
     return f'''<header id="hdr">
   <div class="hdr">
+    <a class="hcall" href="tel:{SITE["phone_e164"]}" aria-label="Call Sankruv Media">{icon("phone")}</a>
     <nav class="hl" aria-label="Main">{left}</nav>
     <a class="logo" href="{root}index.html" aria-label="Sankruv Media home"><img src="{root}assets/img/logo.png" alt="Sankruv Media" width="327" height="156"></a>
     <div class="hr"><nav class="hr-links" aria-label="More">{right}</nav>{btn(root + "contact.html", "Free quote", "hot sm")}
@@ -304,6 +309,14 @@ def header(active, root):
   <div class="mn-svc"><p>Services</p>{mob_s}</div>
   <div class="mn-cta">{btn(SITE["whatsapp_link"], "WhatsApp us", "hot", WA_EXTRA)}{btn("tel:" + SITE["phone_e164"], SITE["phone"], "ghost")}</div>
 </div>'''
+
+def tabbar(active, root):
+    def t(k, f, ic, lab):
+        on = ' class="on" aria-current="page"' if k == active else ''
+        return f'<a href="{root}{f}"{on}>{icon(ic)}<span>{lab}</span></a>'
+    return ('<nav class="tabbar" aria-label="App navigation">' + t('home', 'index.html', 'home', 'Home') + t('services', 'services.html', 'grid', 'Services')
+            + f'<a class="fab" href="{SITE["whatsapp_link"]}" target="_blank" rel="noopener"><span class="fab-b">{icon("wa")}</span><span>WhatsApp</span></a>'
+            + t('blog', 'blog.html', 'doc', 'Blog') + t('contact', 'contact.html', 'send', 'Quote') + '</nav>')
 
 def footer(root):
     svc = ''.join(f'<li><a href="{root}{s["file"]}">{esc(s["name"])}</a></li>' for s in SERVICES)
@@ -341,7 +354,7 @@ def render(path, main, *, title, description, nav='', jsonld=(), og_type='websit
     tokens = {'title': esc(title), 'description': esc(description), 'canonical': url, 'root': root, 'robots': robots, 'og_type': og_type,
               'og_image': BASE + og_image, 'extra_head': extra_head, 'body_class': body_class, 'v': VERSION,
               'jsonld': json.dumps(graph, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/'),
-              'header': header(nav, root), 'footer': footer(root), 'wa': SITE['whatsapp_link'], 'tel': SITE['phone_e164'], 'phone': SITE['phone']}
+              'header': header(nav, root), 'footer': footer(root), 'tabbar': tabbar(nav or ('home' if path == 'index.html' else ''), root), 'wa': SITE['whatsapp_link'], 'tel': SITE['phone_e164'], 'phone': SITE['phone']}
     page = LAYOUT.replace('{{main}}', main)
     page = re.sub(r'\{\{(\w+)\}\}', lambda m: str(tokens.get(m.group(1), m.group(0))), page)
     dest = OUT / path
