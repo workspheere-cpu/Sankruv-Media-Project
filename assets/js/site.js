@@ -103,10 +103,52 @@
     if (!reduce) auto = setInterval(function () { if (!document.hidden) go(idx + 1, false); }, 4200);
   }
 
+  /* ---------- 3b. ring of things we make: spins slowly, drag to turn ---------- */
+  var ring = $('#ring');
+  if (ring) {
+    var rw = $('#ringwrap'), ra = 0, dragX = null, moved = 0, paused = false, rl = 0, rcards = $$('.rc', ring);
+    var setRa = function () { ring.style.setProperty('--ra', ra + 'deg'); };
+    rw.addEventListener('pointerdown', function (e) { dragX = e.clientX; moved = 0; });
+    addEventListener('pointermove', function (e) {
+      if (dragX === null) return; var dx = e.clientX - dragX; dragX = e.clientX; moved += Math.abs(dx); ra += dx * 0.35; setRa();
+    }, { passive: true });
+    addEventListener('pointerup', function () { dragX = null; });
+    addEventListener('pointercancel', function () { dragX = null; });
+    rw.addEventListener('click', function (e) { if (moved > 8) e.preventDefault(); }, true);
+    rw.addEventListener('mouseenter', function () { paused = true; });
+    rw.addEventListener('mouseleave', function () { paused = false; });
+    rcards.forEach(function (c, i) { c.addEventListener('focus', function () { ra = -i * 45; ring.style.transition = 'transform .6s'; setRa(); setTimeout(function () { ring.style.transition = ''; }, 650); }); });
+    if (!reduce) requestAnimationFrame(function spin(t) {
+      var dt = rl ? Math.min(60, t - rl) : 16; rl = t;
+      if (dragX === null && !paused && !document.hidden) { ra -= dt * 0.007; setRa(); }
+      requestAnimationFrame(spin);
+    });
+  }
+
+  /* ---------- 3c. reviews deck ---------- */
+  var deck = $('#deck');
+  if (deck) {
+    var dc = $$('.tcard', deck), front = 0, dauto = null;
+    var show = function (f, user) {
+      front = ((f % dc.length) + dc.length) % dc.length;
+      dc.forEach(function (c, k) {
+        var pos = (k - front + dc.length) % dc.length; c.dataset.p = pos;
+        if (pos === 0) c.removeAttribute('aria-hidden'); else c.setAttribute('aria-hidden', 'true');
+      });
+      if (user && dauto) { clearInterval(dauto); dauto = null; }
+    };
+    $('#dnext').addEventListener('click', function () { show(front + 1, true); });
+    $('#dprev').addEventListener('click', function () { show(front - 1, true); });
+    show(0, false);
+    if (!reduce) dauto = setInterval(function () { if (!document.hidden) show(front + 1, false); }, 6500);
+  }
+
   /* ---------- 4. contact form ----------
      There is no server behind this form yet. It checks the fields, then offers to send the
      message through the visitor's own email app or WhatsApp. */
   var form = $('#lead');
+  var want = /[?&]service=(\w+)/.exec(location.search), sel = $('#sv');
+  if (want && sel) { var wi = { social: 0, web: 1, branding: 2, shoots: 3, unsure: 4 }[want[1]]; if (wi !== undefined) sel.selectedIndex = wi; }
   if (form) form.addEventListener('submit', function (e) {
     e.preventDefault();
     var fn = $('#fn').value.trim(), em = $('#em').value.trim(), ms = $('#ms').value.trim(), err = $('#err');
@@ -131,7 +173,7 @@
     var vs = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
     var fs = [
       'precision highp float;',
-      'uniform vec2 R;uniform float T;uniform vec4 B;uniform vec2 M;uniform float D;uniform float Mo;',
+      'uniform vec2 R;uniform float T;uniform vec4 B;uniform vec2 M;uniform float D;uniform float Mo;uniform float SY;',
       'vec3 C;float S;float SP;float MA;float MB;float MF;',
       'const vec3 TD=vec3(.05,.17,.18);const vec3 TM=vec3(.14,.45,.46);const vec3 TL=vec3(.28,.75,.75);',
       'mat2 rot(float a){float c=cos(a),s=sin(a);return mat2(c,-s,s,c);}',
@@ -168,7 +210,13 @@
       ' w=q;w.xy*=rot(-.7);w.xz*=rot(T*.4);w.yz*=rot(1.1);d=min(d,sdTorus(w,vec2(1.28,.05)));',
       ' w=q;w.yz*=rot(T*.3+.4);d=min(d,sdTorus(w.xzy,vec2(1.62,.045)));return d;}',
       'float model(float id,vec3 q){if(id<.5)return m0(q);if(id<1.5)return m1(q);if(id<2.5)return m2(q);if(id<3.5)return m3(q);if(id<4.5)return m4(q);return m5(q);}',
-      'float map(vec3 p){vec3 q=(p-C)/S;float d=model(MA,q);if(MF>.004)d=mix(d,model(MB,q),MF);return d*S;}',
+      /* three small satellites orbit whatever model is showing */
+      'float orb(vec3 q){float d=9.;for(int i=0;i<3;i++){float fi=float(i);float a=T*(.45+fi*.12)+fi*2.1;',
+      ' vec3 o=vec3(cos(a)*2.1,sin(a*.8+fi)*.7,sin(a)*2.1);d=min(d,length(q-o)-.065-.02*fi);}return d;}',
+      'float map(vec3 p){vec3 q=(p-C)/S;float d=model(MA,q);if(MF>.004)d=mix(d,model(MB,q),MF);return min(d,orb(q))*S;}',
+      /* drifting dust: round points on a hashed grid, two depths */
+      'float dust(vec2 u,float n,float seed){vec2 sc=u*n;vec2 g=floor(sc);float hs=fract(sin(dot(g+seed,vec2(127.1,311.7)))*43758.5453);',
+      ' vec2 so=vec2(fract(hs*13.7),fract(hs*91.3))*.6+.2;return step(.86,hs)*smoothstep(.07,0.,length(fract(sc)-so))*(.45+.55*sin(T*1.3+hs*80.));}',
       'void main(){',
       ' vec2 uv=(gl_FragCoord.xy*2.-R)/R.y;',
       ' C=vec3(B.x,B.y,0.);S=B.z;SP=B.w;MA=floor(Mo);MB=MA+1.;MF=smoothstep(0.,1.,fract(Mo));',
@@ -176,6 +224,15 @@
       ' float gy=gl_FragCoord.y/R.y;vec3 col=mix(vec3(.075,.085,.115),vec3(.022,.027,.05),gy);',
       ' vec2 pc=C.xy*.44;float hd=length(uv-pc)/S;',
       ' col+=TM*.11*exp(-hd*1.8)*D;',
+      /* slow aurora in the upper corner */
+      ' col+=TM*.07*smoothstep(.2,1.,sin(uv.x*1.3+uv.y*2.2+T*.12)*.5+.5)*smoothstep(-.2,1.,uv.y)*smoothstep(-1.5,1.5,uv.x);',
+      ' col+=TL*dust(uv+vec2(T*.006,SY*.22),9.,1.)*.42+TM*dust(uv+vec2(-T*.004,SY*.1),15.,7.)*.5;',
+      /* a lit grid floor running to the horizon, with the model's glow on it */
+      ' if(rd.y<-.03){float tf=(-2.45-ro.y)/rd.y;vec3 fp=ro+rd*tf;vec2 gp=vec2(fp.x,fp.z-T*.35-SY*2.5)*.6;',
+      '  vec2 gg=abs(fract(gp)-.5);float w=.012+tf*.0016;float ln=smoothstep(.5-w,.5,max(gg.x,gg.y));',
+      '  float fade=exp(-tf*.075)*smoothstep(-.03,-.3,rd.y);',
+      '  col+=TM*ln*.5*fade;',
+      '  vec2 dm=fp.xz-vec2(C.x,0.);col+=TL*.2*exp(-dot(dm,dm)*.22/(S*S))*fade*D;}',
       ' vec3 oc=ro-C;float bR=S*3.4;float b=dot(oc,rd);float h=b*b-(dot(oc,oc)-bR*bR);',
       ' if(h>0.){float sq=sqrt(h);float t=max(-b-sq,0.);float tm=-b+sq;bool hit=false;vec3 p=ro;float md=9.;',
       '  for(int i=0;i<80;i++){p=ro+rd*t;float d=map(p);md=min(md,d);if(d<.0025){hit=true;break;}t+=d*.75;if(t>tm)break;}',
@@ -207,7 +264,7 @@
     gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
     var loc = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    var U = {}; ['R', 'T', 'B', 'M', 'D', 'Mo'].forEach(function (n) { U[n] = gl.getUniformLocation(pr, n); });
+    var U = {}; ['R', 'T', 'B', 'M', 'D', 'Mo', 'SY'].forEach(function (n) { U[n] = gl.getUniformLocation(pr, n); });
 
     var fx = $$('[data-fx]').map(function (el) { return { el: el, v: el.dataset.fx.split(' ').map(Number) }; });
     var cur = fx.length ? fx[0].v.slice() : [2.3, 0.15, 1.2, 0, 0, 1, 0];
@@ -237,6 +294,7 @@
         gl.uniform4f(U.B, cur[0] * fit * (small ? 0.55 : 1) + sm[0] * 0.35, cur[1] + (small ? 1.15 : 0) - sm[1] * 0.25, cur[2] * (small ? 0.5 : 0.74), cur[3]);
         gl.uniform2f(U.M, sm[0], sm[1]); gl.uniform1f(U.D, cur[5] * (small ? 0.7 : 1));
         gl.uniform1f(U.Mo, Math.max(0, Math.min(5, cur[6])));
+        gl.uniform1f(U.SY, scrollY / Math.max(1, innerHeight));
         gl.drawArrays(gl.TRIANGLES, 0, 3);
         /* drop the render resolution once if the device cannot keep up */
         if (last) { var dt = ms - last; if (dt > 45) slow++; else slow = Math.max(0, slow - 1); if (slow > 40 && q > 0.4) { q = 0.4; slow = 0; size(); } }

@@ -14,6 +14,11 @@ Plain HTML, CSS and JavaScript. No build step and no libraries, so it runs on an
 | `about.html` | About |
 | `blog.html` | Blog list |
 | `contact.html` | Contact |
+| `social-media-management.html` | Service landing page |
+| `web-development-design.html` | Service landing page |
+| `branding-creative-design.html` | Service landing page |
+| `corporate-commercial-shoots.html` | Service landing page |
+| `404.html` | Not-found page (set it as the error page in hosting) |
 
 Shared files:
 
@@ -37,8 +42,20 @@ the 3D object moves to that position and morphs into that model:
 | 4 | Lattice sphere | Process, Blog |
 | 5 | Signal rings | FAQ, Contact |
 
+The same canvas also draws the background: a lit grid floor running to the horizon, drifting dust
+at two depths, a slow aurora, and three small satellites orbiting the model.
+
+Other 3D pieces are plain CSS: the services prism and the ring of cards on the home page, the
+reviews deck, and the tilt on project cards.
+
 Visitors who turn on "reduce motion" get a still frame, and devices that cannot keep up get a
 lower render resolution automatically.
+
+## Conversion pieces
+
+- Sticky bar on phones with Call, WhatsApp and Free quote.
+- Service picker in the closing section; it opens `contact.html?service=...` with that service preselected.
+- Every service landing page has its own quote button that preselects the service.
 
 ## Before going live
 
