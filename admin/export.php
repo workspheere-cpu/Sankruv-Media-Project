@@ -4,6 +4,7 @@ declare(strict_types=1);
 require __DIR__ . '/_boot.php';
 sk_session();
 require_login();
+if (!is_owner()) { http_response_code(403); exit('Only the owner can export the client list.'); }
 $rows = q("SELECT c.*, (SELECT COUNT(*) FROM projects p WHERE p.client_id = c.id) AS projects,
   (SELECT COALESCE(SUM(amount),0) FROM payments y WHERE y.client_id = c.id) AS billed,
   (SELECT COALESCE(SUM(amount),0) FROM payments y WHERE y.client_id = c.id AND y.status = 'pending') AS pending

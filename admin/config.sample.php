@@ -17,6 +17,13 @@ return [
     'setup_key' => '',
     // Optional one-time password reset link: reset.php?key=THIS_VALUE (at least 24 characters).
     'reset_key' => '',
+    // Test mode: allows short passwords (4+ characters, e.g. test / test) and shows a "Test mode" badge.
+    // Turn it OFF before real client data goes in. When it is off, anyone who signs in with a password
+    // shorter than 8 characters must choose a new one before they can continue.
+    'test_mode' => false,
+    // Extra websites allowed to send contact-form enquiries to admin/lead.php (when the site and the
+    // hub run on different domains), for example ['https://www.sankruvmedia.com'].
+    'lead_origins' => [],
     // Public website address, used for links and the logo inside client emails.
     'public_url' => 'https://www.sankruvmedia.com/',
 

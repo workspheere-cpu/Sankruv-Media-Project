@@ -8,9 +8,15 @@
 declare(strict_types=1);
 require __DIR__ . '/_boot.php';
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') json_out(['ok' => false, 'error' => 'Use POST.'], 405);
+/* only this website (and any extra sites listed in config 'lead_origins') may post enquiries */
 $origin = (string) ($_SERVER['HTTP_ORIGIN'] ?? '');
-if ($origin !== '' && parse_url($origin, PHP_URL_HOST) !== parse_url('http://' . ($_SERVER['HTTP_HOST'] ?? ''), PHP_URL_HOST)) json_out(['ok' => false, 'error' => 'Not allowed.'], 403);
+$allowed = array_map(fn($o) => strtolower((string) parse_url((string) $o, PHP_URL_HOST)), (array) ($CFG['lead_origins'] ?? []));
+$allowed[] = strtolower((string) parse_url('http://' . ($_SERVER['HTTP_HOST'] ?? ''), PHP_URL_HOST));
+$oh = strtolower((string) parse_url($origin, PHP_URL_HOST));
+if ($origin !== '' && !in_array($oh, $allowed, true)) json_out(['ok' => false, 'error' => 'Not allowed.'], 403);
+if ($origin !== '' && $oh !== $allowed[count($allowed) - 1]) { header('Access-Control-Allow-Origin: ' . $origin); header('Vary: Origin'); }
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { header('Access-Control-Allow-Methods: POST'); header('Access-Control-Allow-Headers: Content-Type'); http_response_code(204); exit; }
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') json_out(['ok' => false, 'error' => 'Use POST.'], 405);
 $raw = (string) file_get_contents('php://input', false, null, 0, 20000);
 $in = json_decode($raw, true);
 if (!is_array($in)) json_out(['ok' => false, 'error' => 'The request could not be read.'], 400);

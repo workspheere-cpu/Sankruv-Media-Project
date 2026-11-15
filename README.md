@@ -133,6 +133,13 @@ To edit wording, open the template file. `{{first_name}}` style tags are filled 
 `{{#name}}...{{/name}}` shows a block only when that value exists. The first comment in each file holds
 its subject line and preview text.
 
+**Security.** Every page sends strict security headers (CSP, no framing, HSTS on HTTPS). Sessions
+work only in the browser that signed in, end after 8 idle hours, and end everywhere when that
+account's password changes. Five wrong passwords lock an account for 10 minutes. Only owners can
+export the client list or delete clients. PHP errors are never shown to visitors; they are logged
+to `error.log` in the data folder. `test_mode` in config.php allows short test passwords and must be
+switched off before real use.
+
 **Data and safety.** The database, sessions and setup code live in the data folder, which is never
 committed (see `.gitignore`) and is blocked from the web. Passwords need at least 8 characters. Sign-in uses hashed passwords, CSRF tokens,
 rate limits and a 10-minute lock after 5 wrong passwords. Sessions end after 8 idle hours. Pages send

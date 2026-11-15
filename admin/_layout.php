@@ -63,6 +63,7 @@ function page_start(string $title, string $active, array $opt = []): void
   <header class="top">
     <a class="top-brand" href="index.php" aria-label="<?= h($CFG['brand']) ?> Client Hub home"><img src="assets/icons/icon-192.png" alt="" width="192" height="192"></a>
     <span class="top-title"><?= h($active === 'dash' ? $CFG['app'] : $title) ?></span>
+    <?php if (test_mode()): ?><span class="test-chip" title="Short passwords are allowed while testing. Switch test_mode off in config.php before adding real client data.">Test mode</span><?php endif; ?>
     <button class="search" type="button" data-open="palette" aria-label="Search clients and projects"><?= ic('search') ?><span>Search clients, projects, phone numbers</span><kbd>Ctrl K</kbd></button>
     <div class="top-r">
       <div class="quick">

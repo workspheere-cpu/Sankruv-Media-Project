@@ -11,9 +11,26 @@ declare(strict_types=1);
 if (realpath((string) ($_SERVER['SCRIPT_FILENAME'] ?? '')) === __FILE__) { http_response_code(404); exit; }
 define('SK', 1);
 
-$CFG = ['brand' => 'Sankruv Media', 'app' => 'Client Hub', 'tz' => 'Asia/Kolkata', 'data_dir' => '', 'site_url' => '../index.html', 'setup_key' => '', 'reset_key' => '', 'public_url' => 'https://www.sankruvmedia.com/', 'mail' => []];
+$CFG = ['brand' => 'Sankruv Media', 'app' => 'Client Hub', 'tz' => 'Asia/Kolkata', 'data_dir' => '', 'site_url' => '../index.html', 'setup_key' => '', 'reset_key' => '', 'public_url' => 'https://www.sankruvmedia.com/', 'mail' => [], 'test_mode' => false, 'lead_origins' => []];
 if (is_file(__DIR__ . '/config.php')) { $CFG = array_merge($CFG, (array) require __DIR__ . '/config.php'); }
 date_default_timezone_set($CFG['tz']);
+
+/* never show PHP errors to visitors; log them privately in the data folder instead */
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+error_reporting(E_ALL);
+set_exception_handler(function (Throwable $e): void {
+    error_log('Client Hub: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+    if (!headers_sent()) http_response_code(500);
+    if (function_exists('is_api') && (is_api() || basename((string) ($_SERVER['SCRIPT_NAME'] ?? '')) === 'lead.php')) {
+        if (!headers_sent()) header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => false, 'error' => 'Something went wrong on the server. Please try again.']);
+        return;
+    }
+    echo '<!DOCTYPE html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Something went wrong</title>'
+       . '<body style="font:16px system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0;background:#f3f5f7;color:#101828;text-align:center">'
+       . '<div><h1 style="font-size:20px">Something went wrong</h1><p style="color:#667085">Please go back and try again. If it keeps happening, tell your developer.</p><a href="index.php" style="color:#1f9a9c;font-weight:700">Back to the dashboard</a></div>';
+});
 
 const SK_SERVICES = ['Social Media Management', 'Web Development & Design', 'Branding & Creative Design', 'Corporate & Commercial Shoots'];
 const SK_CLIENT_STATUS = ['lead' => 'New lead', 'active' => 'Active', 'on_hold' => 'On hold', 'completed' => 'Completed', 'archived' => 'Archived'];
@@ -110,7 +127,10 @@ function sk_headers(bool $html = true): void
     header('Referrer-Policy: same-origin');
     header('X-Robots-Tag: noindex, nofollow');
     header('Cache-Control: no-store');
-    header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+    header('Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()');
+    header('Cross-Origin-Opener-Policy: same-origin');
+    header('Cross-Origin-Resource-Policy: same-origin');
+    if (sk_https()) header('Strict-Transport-Security: max-age=31536000');
     if ($html) header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
 }
 function sk_https(): bool
@@ -128,9 +148,15 @@ function sk_session(): void
     $sp = sk_data_dir() . '/sessions';
     if (!is_dir($sp)) @mkdir($sp, 0700, true);
     if (is_dir($sp) && is_writable($sp)) session_save_path($sp);
+    @ini_set('error_log', sk_data_dir() . '/error.log');
     session_start();
-    if (isset($_SESSION['seen']) && time() - (int) $_SESSION['seen'] > 8 * 3600) { $_SESSION = []; session_regenerate_id(true); }
+    /* a session ends after 8 idle hours, and only works in the browser that signed in */
+    $ua = substr(hash('sha256', (string) ($_SERVER['HTTP_USER_AGENT'] ?? '') . '|skhub'), 0, 24);
+    $stale = isset($_SESSION['seen']) && time() - (int) $_SESSION['seen'] > 8 * 3600;
+    $moved = isset($_SESSION['ua']) && !hash_equals((string) $_SESSION['ua'], $ua);
+    if ($stale || $moved) { $_SESSION = []; session_regenerate_id(true); }
     $_SESSION['seen'] = time();
+    $_SESSION['ua'] = $ua;
 }
 function client_ip(): string { return substr((string) ($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0'), 0, 64); }
 function rate_ok(string $key, int $max, int $window): bool
@@ -172,12 +198,22 @@ function user(): ?array
     if ($u !== false) return $u;
     $u = null;
     if (!empty($_SESSION['uid'])) $u = one('SELECT * FROM users WHERE id = ? AND active = 1', [(int) $_SESSION['uid']]);
+    /* changing a password signs that account out everywhere else */
+    if ($u && !hash_equals((string) ($_SESSION['pv'] ?? ''), pass_version($u['pass']))) { $u = null; unset($_SESSION['uid'], $_SESSION['pv']); }
     return $u;
 }
+function pass_version(string $hash): string { return substr(hash('sha256', $hash . '|pv'), 0, 16); }
+/* call after changing the signed-in user's own password, so this session stays signed in */
+function refresh_pass_version(int $uid): void { $h = col('SELECT pass FROM users WHERE id = ?', [$uid]); if ($h) $_SESSION['pv'] = pass_version((string) $h); unset($_SESSION['must_change']); }
+function test_mode(): bool { global $CFG; return !empty($CFG['test_mode']); }
 function is_owner(): bool { return (user()['role'] ?? '') === 'owner'; }
 function require_login(): array
 {
     $u = user();
+    if ($u && !empty($_SESSION['must_change']) && !test_mode()) {
+        if (is_api()) json_out(['ok' => false, 'error' => 'Please set a stronger password on the Team page first.'], 403);
+        if (basename((string) $_SERVER['SCRIPT_NAME']) !== 'team.php') { flash('For security, choose a new password of at least 8 characters before you continue.', 'bad'); redirect('team.php'); }
+    }
     if ($u) return $u;
     if (is_api()) json_out(['ok' => false, 'error' => 'Please sign in again.'], 401);
     $self = basename((string) $_SERVER['SCRIPT_NAME']);
@@ -198,6 +234,8 @@ function attempt_login(string $username, string $password): bool
     if (password_needs_rehash($u['pass'], PASSWORD_DEFAULT)) q('UPDATE users SET pass = ? WHERE id = ?', [password_hash($password, PASSWORD_DEFAULT), $u['id']]);
     session_regenerate_id(true);
     $_SESSION['uid'] = (int) $u['id'];
+    $_SESSION['pv'] = pass_version((string) one('SELECT pass FROM users WHERE id = ?', [$u['id']])['pass']);
+    if (strlen($password) < 8) $_SESSION['must_change'] = 1; else unset($_SESSION['must_change']);
     unset($_SESSION['csrf']);
     q('UPDATE users SET fails = 0, locked_until = 0, last_login = ? WHERE id = ?', [now(), $u['id']]);
     sk_gc_sessions();
@@ -212,7 +250,9 @@ function sk_gc_sessions(): void
 function valid_username(string $u): bool { return (bool) preg_match('/^[a-z0-9._-]{3,32}$/', $u); }
 function password_problem(string $p, string $confirm): ?string
 {
-    if (strlen($p) < 8) return 'Use at least 8 characters for the password.';
+    $min = test_mode() ? 4 : 8;
+    if (strlen($p) < $min) return 'Use at least ' . $min . ' characters for the password.';
+    if (strlen($p) > 200) return 'That password is too long.';
     if ($p !== $confirm) return 'The two passwords do not match.';
     return null;
 }

@@ -65,7 +65,7 @@ $h = fn($v) => h($v);
     <form class="card" id="card" method="post" novalidate autocomplete="on" aria-labelledby="h2">
       <div class="ch">
         <span class="lg"><img src="../assets/img/logo.png" alt="Sankruv Media" width="525" height="256"></span>
-        <span class="st"><i></i><span>Secure sign-in</span></span>
+        <span class="st"><i></i><span><?= test_mode() ? 'Test mode' : 'Secure sign-in' ?></span></span>
       </div>
       <h2 id="h2">Welcome back</h2>
       <p class="sub">Sign in with your Sankruv ID to open the Client Hub.</p>

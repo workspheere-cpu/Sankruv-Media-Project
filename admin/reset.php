@@ -64,8 +64,8 @@ $first = $users[0] ?? null;
       <label for="u">User ID</label>
       <div class="in"><?= ic('tag') ?><input id="u" name="username" required value="<?= $val('username', (string) ($first['username'] ?? '')) ?>" autocomplete="username" spellcheck="false" autocapitalize="off"></div>
       <div class="two">
-        <div><label for="p">New password</label><div class="in"><?= ic('lock') ?><input id="p" name="password" type="password" required minlength="8" autocomplete="new-password" placeholder="At least 8 characters"></div></div>
-        <div><label for="p2">Repeat password</label><div class="in"><?= ic('lock') ?><input id="p2" name="password2" type="password" required minlength="8" autocomplete="new-password"></div></div>
+        <div><label for="p">New password</label><div class="in"><?= ic('lock') ?><input id="p" name="password" type="password" required minlength="<?= test_mode() ? 4 : 8 ?>" autocomplete="new-password" placeholder="At least <?= test_mode() ? 4 : 8 ?> characters"></div></div>
+        <div><label for="p2">Repeat password</label><div class="in"><?= ic('lock') ?><input id="p2" name="password2" type="password" required minlength="<?= test_mode() ? 4 : 8 ?>" autocomplete="new-password"></div></div>
       </div>
       <button type="submit" class="go" id="go"><span class="sp" aria-hidden="true"></span><span class="t">Save and sign in <?= ic('arrow') ?></span></button>
     </form>

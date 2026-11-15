@@ -25,7 +25,7 @@ page_start('Clients', 'clients');
 <section class="page-h">
   <div><h1>Clients</h1><p class="lead"><?= $counts['all'] ?> client<?= $counts['all'] === 1 ? '' : 's' ?><?= $counts['lead'] ? ', ' . $counts['lead'] . ' open lead' . ($counts['lead'] > 1 ? 's' : '') : '' ?>. Open any profile to see projects, reminders, payments and history.</p></div>
   <div class="page-act">
-    <a class="btn ghost" href="export.php"><?= ic('download') ?>Export CSV</a>
+    <?php if (is_owner()): ?><a class="btn ghost" href="export.php"><?= ic('download') ?>Export CSV</a><?php endif; ?>
     <button class="btn pri" type="button" data-open="dlg-client"><?= ic('plus') ?>Add client</button>
   </div>
 </section>

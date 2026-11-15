@@ -5,7 +5,7 @@ AddType application/manifest+json .webmanifest
 <IfModule mod_headers.c>
   Header set X-Robots-Tag "noindex, nofollow"
 </IfModule>
-<FilesMatch "^(_.*\.php|config\.php|config\.sample\.php|reset-used\.txt|.*\.sqlite.*|setup-code\.txt)$">
+<FilesMatch "^(_.*\.php|config\.php|config\.sample\.php|reset-used\.txt|error\.log|.*\.sqlite.*|setup-code\.txt)$">
   <IfModule mod_authz_core.c>
     Require all denied
   </IfModule>

@@ -436,6 +436,12 @@
     sync();
   }
 
+  /* ---------- dashboard insights tabs (phones) ---------- */
+  $$('.dtabs button').forEach(b => b.addEventListener('click', () => {
+    $$('.dtabs button').forEach(x => x.classList.toggle('on', x === b));
+    $$('.dash .dt').forEach(p => p.classList.toggle('dt-on', p.classList.contains(b.dataset.dt)));
+  }));
+
   /* ---------- installable app: register the service worker ---------- */
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
     window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });

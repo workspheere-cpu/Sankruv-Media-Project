@@ -59,6 +59,9 @@ $hr = (int) date('G');
 $greet = $hr < 12 ? 'Good morning' : ($hr < 17 ? 'Good afternoon' : 'Good evening');
 $first = explode(' ', trim($me['name']))[0];
 $todo = $k['rem_over'] + $k['rem_today'];
+$todayDone = (int) col('SELECT COUNT(*) FROM reminders WHERE done = 1 AND substr(due_at, 1, 10) = ?', [$t]);
+$todayAll = $todayDone + $todo;
+$todayPct = $todayAll ? (int) round($todayDone / $todayAll * 100) : 100;
 $summary = $clientsTotal === 0 ? 'Add your first client to start tracking projects, deadlines and payments.'
     : ($todo ? $todo . ' reminder' . ($todo > 1 ? 's' : '') . ' need' . ($todo > 1 ? '' : 's') . ' attention today' : 'No reminders due today')
       . ($k['due7'] ? ', and ' . $k['due7'] . ' project deadline' . ($k['due7'] > 1 ? 's are' : ' is') . ' coming up this week.' : '.');
@@ -75,6 +78,24 @@ page_start('Dashboard', 'dash');
     <button class="btn ghost" type="button" data-open="dlg-reminder"><?= ic('bell') ?>Add reminder</button>
     <button class="btn pri" type="button" data-open="dlg-project"><?= ic('layers') ?>New project</button>
   </div>
+</section>
+
+<section class="m-hero" aria-label="Today at a glance">
+  <div class="mh-top">
+    <div><small><?= h(date('l, j M')) ?></small><h1><?= h($greet) ?>, <?= h($first) ?></h1><p><?= h($summary) ?></p></div>
+    <div class="mh-ring" style="--p:<?= $todayPct ?>" role="img" aria-label="<?= $todayDone ?> of <?= $todayAll ?> reminders done today"><span><b><?= $todayDone ?>/<?= $todayAll ?></b><small>today</small></span></div>
+  </div>
+  <div class="mh-stats">
+    <a href="payments.php"><small>To collect</small><b><?= inr($k['pending']) ?></b></a>
+    <a href="payments.php?f=paid"><small>This month</small><b><?= inr($k['paid_month']) ?></b></a>
+    <a href="projects.php"><small>Live projects</small><b><?= $k['live'] ?></b></a>
+  </div>
+  <nav class="mh-act" aria-label="Quick add">
+    <button type="button" data-open="dlg-client"><span><?= ic('user') ?></span>Client</button>
+    <button type="button" data-open="dlg-reminder"><span><?= ic('bell') ?></span>Reminder</button>
+    <button type="button" data-open="dlg-project"><span><?= ic('layers') ?></span>Project</button>
+    <button type="button" data-open="dlg-payment"><span><?= ic('wallet') ?></span>Payment</button>
+  </nav>
 </section>
 
 <nav class="qa-row" aria-label="Quick add">
@@ -103,17 +124,22 @@ page_start('Dashboard', 'dash');
 </nav>
 
 <div class="dash">
-  <section class="panel money6">
+  <nav class="dtabs" aria-label="Insights">
+    <button type="button" class="on" data-dt="money6">Collections</button>
+    <button type="button" data-dt="pipe">Pipeline</button>
+    <button type="button" data-dt="topc">Top clients</button>
+  </nav>
+  <section class="panel money6 dt dt-on">
     <header class="ph"><h2><?= ic('trend') ?>Collections</h2><a class="more" href="payments.php?f=paid">Payments<?= ic('chev') ?></a></header>
     <div class="m-sum"><div><small>Received in <?= h(date('F')) ?></small><b><?= inr($mNow) ?></b><?php if ($mChange !== null): ?><em class="<?= $mChange >= 0 ? 'up' : 'down' ?>"><?= $mChange >= 0 ? '+' : '' ?><?= $mChange ?>% vs last month</em><?php endif; ?></div><div><small>Last 6 months</small><b><?= inr($mTotal) ?></b></div><div><small>Still to collect</small><b class="t-warn"><?= inr($k['pending']) ?></b></div></div>
-    <div class="bars" role="img" aria-label="Money received per month for the last six months">
+    <div class="bars<?= $mTotal ? '' : ' none' ?>" role="img" aria-label="Money received per month for the last six months"><?php if (!$mTotal): ?><p class="bars-empty">No payments received yet. Mark a payment as paid to see it here.</p><?php endif; ?>
       <?php foreach ($months as $m => $v): ?>
       <div class="bc<?= $m === date('Y-m') ? ' cur' : '' ?>"><span class="bv"><?= $v ? h(inr($v)) : '' ?></span><i style="--h:<?= max(3, (int) round($v / $mMax * 100)) ?>%"></i><small><?= h(date('M', strtotime($m . '-01'))) ?></small></div>
       <?php endforeach; ?>
     </div>
   </section>
 
-  <section class="panel topc">
+  <section class="panel topc dt">
     <header class="ph"><h2><?= ic('star') ?>Top clients</h2><a class="more" href="clients.php?sort=value">All clients<?= ic('chev') ?></a></header>
     <?php if (!$top): ?>
       <div class="empty"><span class="e-i"><?= ic('wallet') ?></span><p>Your highest billing clients appear here once you add payments.</p></div>
@@ -159,7 +185,7 @@ page_start('Dashboard', 'dash');
     <?php endif; ?>
   </section>
 
-  <section class="panel pipe">
+  <section class="panel pipe dt">
     <header class="ph"><h2><?= ic('layers') ?>Project pipeline</h2></header>
     <div class="stack" aria-hidden="true"><?php foreach ($pipe as $s => $n): if ($n): ?><i class="s-<?= $s ?>" style="flex:<?= $n ?>"></i><?php endif; endforeach; ?></div>
     <ul class="pipe-list">
