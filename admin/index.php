@@ -31,6 +31,30 @@ $acts = q('SELECT a.*, c.name AS client, u.name AS who FROM activity a LEFT JOIN
 $pays = q("SELECT p.*, c.name AS client FROM payments p JOIN clients c ON c.id = p.client_id WHERE p.status = 'pending' AND p.due_date != '' AND p.due_date <= ? ORDER BY p.due_date LIMIT 5", [$in7])->fetchAll();
 $clientsTotal = (int) col('SELECT COUNT(*) FROM clients');
 
+/* this week: reminders and deadlines per day */
+$week = [];
+for ($i = 0; $i < 7; $i++) {
+    $d = date('Y-m-d', strtotime("+$i day"));
+    $week[] = ['d' => $d,
+        'rem' => (int) col('SELECT COUNT(*) FROM reminders WHERE done = 0 AND substr(due_at, 1, 10) = ?', [$d]),
+        'dl' => (int) col("SELECT COUNT(*) FROM projects WHERE status != 'done' AND due_date = ?", [$d])];
+}
+$week[0]['rem'] += $k['rem_over'];
+
+/* collections: money received in each of the last six months */
+$months = [];
+for ($i = 5; $i >= 0; $i--) {
+    $m = date('Y-m', strtotime(date('Y-m-01') . " -$i month"));
+    $months[$m] = (int) col("SELECT COALESCE(SUM(amount),0) FROM payments WHERE status = 'paid' AND substr(paid_date, 1, 7) = ?", [$m]);
+}
+$mVals = array_values($months); $mMax = max(1, max($mVals));
+$mNow = end($mVals); $mPrev = $mVals[4];
+$mChange = $mPrev ? (int) round(($mNow - $mPrev) / $mPrev * 100) : null;
+$mTotal = array_sum($mVals);
+$top = q("SELECT c.id, c.name, COALESCE(SUM(p.amount),0) AS billed, COALESCE(SUM(CASE WHEN p.status = 'paid' THEN p.amount END),0) AS paid
+  FROM clients c JOIN payments p ON p.client_id = c.id GROUP BY c.id ORDER BY billed DESC LIMIT 5")->fetchAll();
+$topMax = max(1, (int) ($top[0]['billed'] ?? 1));
+
 $hr = (int) date('G');
 $greet = $hr < 12 ? 'Good morning' : ($hr < 17 ? 'Good afternoon' : 'Good evening');
 $first = explode(' ', trim($me['name']))[0];
@@ -69,7 +93,39 @@ page_start('Dashboard', 'dash');
   <a class="kpi" href="payments.php"><span class="k-i ok"><?= ic('wallet') ?></span><b><?= inr($k['pending']) ?></b><span>To collect<?php if ($k['overdue_pay']): ?> <em class="down"><?= inr($k['overdue_pay']) ?> overdue</em><?php endif; ?></span></a>
 </section>
 
+<nav class="week" aria-label="This week">
+  <?php foreach ($week as $i => $w): $n = $w['rem'] + $w['dl']; ?>
+  <a class="wd<?= $i === 0 ? ' now' : '' ?><?= $n ? ' busy' : '' ?>" href="reminders.php" title="<?= h(fmt_date($w['d'])) ?>: <?= $w['rem'] ?> reminders, <?= $w['dl'] ?> deadlines">
+    <small><?= $i === 0 ? 'Today' : h(date('D', strtotime($w['d']))) ?></small><b><?= h(date('j', strtotime($w['d']))) ?></b>
+    <span class="wd-dots"><?php for ($j = 0; $j < min(3, $w['rem']); $j++): ?><i class="r"></i><?php endfor; ?><?php for ($j = 0; $j < min(2, $w['dl']); $j++): ?><i class="d"></i><?php endfor; ?></span>
+  </a>
+  <?php endforeach; ?>
+</nav>
+
 <div class="dash">
+  <section class="panel money6">
+    <header class="ph"><h2><?= ic('trend') ?>Collections</h2><a class="more" href="payments.php?f=paid">Payments<?= ic('chev') ?></a></header>
+    <div class="m-sum"><div><small>Received in <?= h(date('F')) ?></small><b><?= inr($mNow) ?></b><?php if ($mChange !== null): ?><em class="<?= $mChange >= 0 ? 'up' : 'down' ?>"><?= $mChange >= 0 ? '+' : '' ?><?= $mChange ?>% vs last month</em><?php endif; ?></div><div><small>Last 6 months</small><b><?= inr($mTotal) ?></b></div><div><small>Still to collect</small><b class="t-warn"><?= inr($k['pending']) ?></b></div></div>
+    <div class="bars" role="img" aria-label="Money received per month for the last six months">
+      <?php foreach ($months as $m => $v): ?>
+      <div class="bc<?= $m === date('Y-m') ? ' cur' : '' ?>"><span class="bv"><?= $v ? h(inr($v)) : '' ?></span><i style="--h:<?= max(3, (int) round($v / $mMax * 100)) ?>%"></i><small><?= h(date('M', strtotime($m . '-01'))) ?></small></div>
+      <?php endforeach; ?>
+    </div>
+  </section>
+
+  <section class="panel topc">
+    <header class="ph"><h2><?= ic('star') ?>Top clients</h2><a class="more" href="clients.php?sort=value">All clients<?= ic('chev') ?></a></header>
+    <?php if (!$top): ?>
+      <div class="empty"><span class="e-i"><?= ic('wallet') ?></span><p>Your highest billing clients appear here once you add payments.</p></div>
+    <?php else: ?>
+      <ol class="top-list">
+        <?php foreach ($top as $c): ?>
+        <li><a href="client.php?id=<?= (int) $c['id'] ?>#payments"><?= avatar($c, 'sm') ?><span class="tl-n"><b><?= h($c['name']) ?></b><span class="bar"><i style="width:<?= (int) round($c['billed'] / $topMax * 100) ?>%"></i></span></span><span class="tl-v"><b><?= inr($c['billed']) ?></b><small><?= $c['billed'] ? (int) round($c['paid'] / $c['billed'] * 100) : 0 ?>% paid</small></span></a></li>
+        <?php endforeach; ?>
+      </ol>
+    <?php endif; ?>
+  </section>
+
   <section class="panel today">
     <header class="ph"><h2><?= ic('bell') ?>Today</h2><a class="more" href="reminders.php">All reminders<?= ic('chev') ?></a></header>
     <?php if (!$todayList): ?>

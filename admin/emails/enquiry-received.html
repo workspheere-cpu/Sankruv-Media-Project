@@ -1,0 +1,19 @@
+<!--
+subject: Thank you, {{first_name}}. We have your enquiry
+preheader: Our team will contact you within one working day with ideas and a plan.
+tag: Enquiry received
+title: Thank you for your enquiry
+about: Sent to a new lead when the website contact form creates them. Confirms the brief and sets expectations.
+-->
+<h1 style="margin:0 0 12px;font:bold 24px/1.25 Arial,Helvetica,sans-serif;color:#101828;">Thank you, {{first_name}}!</h1>
+<p style="margin:0 0 16px;">We have received your enquiry and our team is already looking at it. Here is what you shared with us:</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 22px;background:#f4fbfb;border:1px solid #cdeced;border-radius:14px;">
+<tr><td style="padding:12px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #e1f3f3;">Services</td><td align="right" style="padding:12px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #e1f3f3;">{{services}}</td></tr>
+<tr><td style="padding:12px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #e1f3f3;">Start</td><td align="right" style="padding:12px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #e1f3f3;">{{timeline}}</td></tr>
+<tr><td style="padding:12px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #e1f3f3;">Reference</td><td align="right" style="padding:12px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #e1f3f3;">{{reference}}</td></tr>
+</table>
+{{#message}}<p style="margin:0 0 16px;padding:14px 18px;border-left:3px solid #48bec0;background:#f7f9fa;color:#475467;font-style:italic;">{{message}}</p>{{/message}}
+<p style="margin:0 0 6px;font-weight:bold;color:#101828;">What happens next</p>
+<p style="margin:0 0 16px;">1. We study your brand and goals.<br>2. We call or WhatsApp you within one working day.<br>3. You receive a clear plan with scope, timeline and a free quote.</p>
+<p style="margin:0 0 16px;">Want to talk sooner? Message us on WhatsApp and we will reply right away.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 22px;"><tr><td style="border-radius:12px;background:#1f9a9c;"><a href="{{whatsapp_url}}" style="display:inline-block;padding:14px 24px;font:bold 15px Arial,Helvetica,sans-serif;color:#ffffff;text-decoration:none;border-radius:12px;">Chat on WhatsApp</a></td></tr></table>

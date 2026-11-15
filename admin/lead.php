@@ -39,4 +39,5 @@ $brief = "New enquiry from the website\n\nServices: " . (implode(', ', $asked) ?
 q('INSERT INTO activity (client_id, kind, body, created_at) VALUES (?, ?, ?, ?)', [$cid, 'lead', $brief, now()]);
 q('INSERT INTO reminders (client_id, title, due_at, priority, created_at) VALUES (?, ?, ?, ?, ?)',
     [$cid, 'Reply to ' . $name . "'s website enquiry", date('Y-m-d', strtotime('+1 day')) . ' 10:00', 'high', now()]);
+mail_auto('enquiry_received', $cid, 0, 0, ['services' => implode(', ', $asked) ?: 'Not given', 'timeline' => $timeline ?: 'Not given', 'message' => $message]);
 json_out(['ok' => true]);

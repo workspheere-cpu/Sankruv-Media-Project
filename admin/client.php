@@ -79,6 +79,7 @@ page_start($c['name'], 'clients');
     <button class="gact" type="button" data-open="dlg-reminder"><span><?= ic('bell') ?></span>Reminder</button>
     <button class="gact" type="button" data-open="dlg-project"><span><?= ic('layers') ?></span>Project</button>
     <button class="gact" type="button" data-tab-go="activity" data-focus="#note-body"><span><?= ic('note') ?></span>Note</button>
+    <button class="gact" type="button" data-open="dlg-email"><span><?= ic('send') ?></span>Send email</button>
   </div>
   <nav class="ptabs" role="tablist" aria-label="Client sections">
     <a href="#overview" role="tab" data-tab="overview">Overview</a>
@@ -177,7 +178,7 @@ page_start($c['name'], 'clients');
         <label>Value (₹)<input type="number" min="0" step="1" value="<?= (int) $p['value'] ?: '' ?>" data-save="project" data-id="<?= (int) $p['id'] ?>" data-field="value" inputmode="numeric"></label>
       </div>
       <textarea rows="2" placeholder="Scope, deliverables, links" data-save="project" data-id="<?= (int) $p['id'] ?>" data-field="details"><?= h($p['details']) ?></textarea>
-      <footer><small>Updated <?= h(strtolower(ago($p['updated_at']))) ?></small><button class="icon-btn" type="button" data-act="project.delete" data-id="<?= (int) $p['id'] ?>" data-confirm="Delete the project “<?= h($p['title']) ?>”?" aria-label="Delete project"><?= ic('trash') ?></button></footer>
+      <footer><small>Updated <?= h(strtolower(ago($p['updated_at']))) ?></small><span class="pc-act"><button class="icon-btn" type="button" data-open="dlg-email" data-set='<?= h(json_encode(['template' => $p['status'] === 'done' ? 'project-delivered' : 'project-confirmed', 'project_id' => (string) $p['id'], 'payment_id' => ''])) ?>' title="Email the client about this project" aria-label="Email the client about this project"><?= ic('send') ?></button><button class="icon-btn" type="button" data-act="project.delete" data-id="<?= (int) $p['id'] ?>" data-confirm="Delete the project “<?= h($p['title']) ?>”?" aria-label="Delete project"><?= ic('trash') ?></button></span></footer>
     </article>
   <?php endforeach; ?>
   </div>
@@ -230,7 +231,7 @@ page_start($c['name'], 'clients');
         <td class="num"><?= inr($p['amount']) ?></td>
         <td><span class="t-<?= $p['status'] === 'paid' ? 'mute' : due_tone($p['due_date']) ?>"><?= h($p['due_date'] ? ($p['status'] === 'paid' ? fmt_date($p['due_date']) : rel_day($p['due_date'])) : 'No date') ?></span></td>
         <td><label class="chip-sel t-<?= $p['status'] === 'paid' ? 'ok' : ($late ? 'bad' : 'warn') ?>"><span class="sr">Status</span><select data-save="payment" data-id="<?= (int) $p['id'] ?>" data-field="status" data-reload><?= $sel(SK_PAY_STATUS, $p['status']) ?></select><?= ic('down', 'i sm') ?></label></td>
-        <td class="act"><button class="icon-btn" type="button" data-act="payment.delete" data-id="<?= (int) $p['id'] ?>" data-confirm="Delete this payment record?" aria-label="Delete payment"><?= ic('trash') ?></button></td>
+        <td class="act"><button class="icon-btn" type="button" data-open="dlg-email" data-set='<?= h(json_encode(['template' => $p['status'] === 'paid' ? 'payment-received' : ($late ? 'payment-reminder' : 'payment-request'), 'payment_id' => (string) $p['id'], 'project_id' => ''])) ?>' title="Email the client about this payment" aria-label="Email the client about this payment"><?= ic('send') ?></button><button class="icon-btn" type="button" data-act="payment.delete" data-id="<?= (int) $p['id'] ?>" data-confirm="Delete this payment record?" aria-label="Delete payment"><?= ic('trash') ?></button></td>
       </tr>
       <?php endforeach; ?>
     </tbody>
@@ -240,7 +241,7 @@ page_start($c['name'], 'clients');
 
 <!-- ============ history ============ -->
 <section class="tabp" id="tab-activity" data-panel="activity">
-  <div class="tab-h"><h2>History</h2></div>
+  <div class="tab-h"><h2>History</h2><button class="btn ghost sm" type="button" data-open="dlg-email"><?= ic('send') ?>Send email</button></div>
   <form class="log" data-action="note.create" data-reload>
     <input type="hidden" name="client_id" value="<?= $id ?>">
     <div class="log-kinds" role="radiogroup" aria-label="Type">
@@ -262,4 +263,21 @@ page_start($c['name'], 'clients');
     <?php endforeach; ?>
   </ol>
 </section>
+
+<dialog class="dlg" id="dlg-email" aria-labelledby="de-h">
+  <form class="dlg-f" data-action="email.send">
+    <header><span class="dlg-i"><?= ic('send') ?></span><div><h2 id="de-h">Send an email</h2><p>Pick a ready-made email, check the preview, then send it to <?= h($c['name']) ?>.</p></div><button type="button" class="icon-btn" data-close aria-label="Close"><?= ic('x') ?></button></header>
+    <input type="hidden" name="client_id" value="<?= $id ?>">
+    <div class="grid2">
+      <label class="fld full">Email<select name="template" id="em-tpl"><?php foreach (mail_templates() as $slug => $t): ?><option value="<?= h($slug) ?>" data-about="<?= h($t['about']) ?>"><?= h($t['title']) ?></option><?php endforeach; ?></select></label>
+      <label class="fld full">Send to<input name="to" type="email" maxlength="120" value="<?= h($c['email']) ?>" placeholder="client@example.com"></label>
+      <label class="fld">Project<select name="project_id" id="em-proj"><option value="">No project</option><?php foreach ($projects as $p): ?><option value="<?= (int) $p['id'] ?>"><?= h($p['title']) ?></option><?php endforeach; ?></select></label>
+      <label class="fld">Payment<select name="payment_id" id="em-pay"><option value="">No payment</option><?php foreach ($pays as $p): ?><option value="<?= (int) $p['id'] ?>"><?= h($p['label'] . ', ' . inr($p['amount']) . ($p['status'] === 'paid' ? ', paid' : '')) ?></option><?php endforeach; ?></select></label>
+    </div>
+    <p class="em-about" id="em-about"></p>
+    <?php if (!mail_enabled()): ?><p class="em-off"><?= ic('lock') ?><span>Email sending is not switched on yet. You can preview every email now. Your developer turns sending on in <b>config.php</b>.</span></p><?php endif; ?>
+    <p class="dlg-err" role="alert"></p>
+    <footer><a class="btn ghost" id="em-prev" href="emails.php" target="_blank" rel="noopener" data-client="<?= $id ?>"><?= ic('eye') ?>Preview</a><button class="btn pri" type="submit"<?= mail_enabled() ? '' : ' disabled' ?>><?= ic('send') ?>Send email</button></footer>
+  </form>
+</dialog>
 <?php page_end(['client' => $id]);

@@ -109,6 +109,30 @@ Share, then "Add to Home Screen" (iPhone). It opens full screen with its own ico
 caches only styles, scripts and icons, never pages or client data. The same manifest can be wrapped
 as an Android app later (for example with Bubblewrap or PWABuilder).
 
+**Client emails.** Seven branded emails live in `admin/emails/` (plain HTML with inline styles, safe for
+Gmail, Outlook and phones):
+
+| Template | When it is used |
+|---|---|
+| `enquiry-received` | Thank you to a website enquiry (automatic) |
+| `welcome` | Welcome a new client (optional automatic when a lead becomes Active) |
+| `project-confirmed` | Project confirmation with service, dates and value |
+| `payment-request` | Ask for an invoice, advance or retainer, with payment details |
+| `payment-reminder` | Polite reminder for a due or overdue payment |
+| `payment-received` | Receipt when a payment is marked as paid (automatic) |
+| `project-delivered` | Delivery note with a review request (optional automatic) |
+
+The team sends any of them from a client's profile ("Send email", or the send icon on a project or
+payment). The **Client emails** page previews every template. Sending is off until the `mail` block in
+`admin/config.php` is filled in: copy it from `config.sample.php`, set `enabled` to `true` and add the
+SMTP mailbox (Hostinger: `smtp.hostinger.com`, port 465, `ssl`, full mailbox address and its password).
+Also set `public_url` so the logo and links in emails point to the live site, and fill in
+`payment_info` and `review_url`. Every email sent is recorded in the client's History.
+
+To edit wording, open the template file. `{{first_name}}` style tags are filled in for you, and
+`{{#name}}...{{/name}}` shows a block only when that value exists. The first comment in each file holds
+its subject line and preview text.
+
 **Data and safety.** The database, sessions and setup code live in the data folder, which is never
 committed (see `.gitignore`) and is blocked from the web. Passwords need at least 8 characters. Sign-in uses hashed passwords, CSRF tokens,
 rate limits and a 10-minute lock after 5 wrong passwords. Sessions end after 8 idle hours. Pages send

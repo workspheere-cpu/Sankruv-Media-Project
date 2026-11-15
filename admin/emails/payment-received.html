@@ -1,0 +1,18 @@
+<!--
+subject: Payment received, thank you! ({{amount}})
+preheader: We have received {{amount}} for {{payment_label}}. Your receipt is inside.
+tag: Payment receipt
+title: Payment received receipt
+about: Thanks the client and confirms the amount received. Sent automatically when a payment is marked as paid.
+-->
+<h1 style="margin:0 0 12px;font:bold 24px/1.25 Arial,Helvetica,sans-serif;color:#101828;">Payment received, thank you!</h1>
+<p style="margin:0 0 16px;">Hi {{first_name}}, we have received your payment. Thank you for your trust in {{brand}}. Please keep this email as your receipt.</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 22px;background:#f4fbfb;border:1px solid #cdeced;border-radius:14px;">
+<tr><td style="padding:12px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #e1f3f3;">Receipt number</td><td align="right" style="padding:12px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #e1f3f3;">{{receipt_no}}</td></tr>
+<tr><td style="padding:12px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #e1f3f3;">For</td><td align="right" style="padding:12px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #e1f3f3;">{{payment_label}}</td></tr>
+<tr><td style="padding:12px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #e1f3f3;">Amount received</td><td align="right" style="padding:12px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #e1f3f3;">{{amount}}</td></tr>
+<tr><td style="padding:12px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #e1f3f3;">Date</td><td align="right" style="padding:12px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #e1f3f3;">{{paid_date}}</td></tr>
+<tr><td style="padding:12px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #e1f3f3;">Status</td><td align="right" style="padding:12px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #e1f3f3;"><span style="color:#067647;">Paid</span></td></tr>
+</table>
+{{#balance}}<p style="margin:0 0 16px;">Remaining balance on your account: <b style="color:#101828;">{{balance}}</b></p>{{/balance}}
+<p style="margin:0 0 16px;">If you need a formal invoice or GST bill, just reply to this email and we will share it.</p>

@@ -15,6 +15,7 @@ function page_start(string $title, string $active, array $opt = []): void
         ['projects.php', 'projects', 'Projects', 'layers', 0],
         ['reminders.php', 'reminders', 'Reminders', 'bell', $dueCount],
         ['payments.php', 'payments', 'Payments', 'wallet', 0],
+        ['emails.php', 'emails', 'Client emails', 'mail', 0],
     ];
     if (is_owner()) $nav[] = ['team.php', 'team', 'Team', 'shield', 0];
     $f = flash_take();
@@ -80,6 +81,7 @@ function page_start(string $title, string $active, array $opt = []): void
           <p class="menu-h"><b><?= h($u['name'] ?? '') ?></b><small><?= h($u['username'] ?? '') ?>, <?= ($u['role'] ?? '') === 'owner' ? 'Owner' : 'Team member' ?></small></p>
           <a href="team.php"><?= ic('lock') ?><?= is_owner() ? 'Team and password' : 'Change password' ?></a>
           <a href="payments.php"><?= ic('wallet') ?>Payments</a>
+          <a href="emails.php"><?= ic('mail') ?>Client emails</a>
           <a href="<?= h($CFG['site_url']) ?>" target="_blank" rel="noopener"><?= ic('globe') ?>View website</a>
           <form method="post" action="logout.php"><?= csrf_field() ?><button type="submit"><?= ic('logout') ?>Sign out</button></form>
         </div>

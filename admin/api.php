@@ -103,6 +103,7 @@ switch ($in['action'] ?? '') {
         $val = clean_field('client', $field, $in['value'] ?? '');
         q("UPDATE clients SET $field = ?, updated_at = ? WHERE id = ?", [$val, now(), $id]);
         if ($field === 'status' && $old['status'] !== $val) log_activity($id, 'system', 'Status changed from ' . SK_CLIENT_STATUS[$old['status']] . ' to ' . SK_CLIENT_STATUS[$val]);
+        if ($field === 'status' && $old['status'] === 'lead' && $val === 'active') mail_auto('welcome', $id);
         json_out(['ok' => true, 'value' => $val, 'display' => $field === 'budget' ? ($val ? inr($val) : '') : (string) $val]);
 
     case 'client.delete':
@@ -119,7 +120,9 @@ switch ($in['action'] ?? '') {
         foreach (['start_date', 'due_date'] as $k) if (!valid_date($s($k, 10))) bad('Enter valid dates.');
         q('INSERT INTO projects (client_id, title, service, status, start_date, due_date, progress, value, details, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
             [$cid, $title, in_array($in['service'] ?? '', SK_SERVICES, true) ? $in['service'] : '', $status, $s('start_date', 10), $s('due_date', 10), $status === 'done' ? 100 : 0, max(0, (int) ($in['value'] ?? 0)), $s('details', 4000), now(), now()]);
+        $pid = (int) db()->lastInsertId();
         log_activity($cid, 'project', 'New project: ' . $title . ($s('due_date', 10) ? ', deadline ' . fmt_date($s('due_date', 10)) : ''));
+        mail_auto('project_confirmed', $cid, $pid);
         q('UPDATE clients SET updated_at = ? WHERE id = ?', [now(), $cid]);
         json_out(['ok' => true, 'url' => 'client.php?id=' . $cid . '#projects', 'message' => 'Project created']);
 
@@ -133,6 +136,7 @@ switch ($in['action'] ?? '') {
         if ($field === 'progress' && $val === 100 && $p['status'] !== 'done') { $extra = ", status = 'review'"; }
         q("UPDATE projects SET $field = ?, updated_at = ?$extra WHERE id = ?", array_merge($args, [$id]));
         if ($field === 'status' && $p['status'] !== $val) log_activity((int) $p['client_id'], 'project', $p['title'] . ': ' . SK_PROJECT_STATUS[$val]);
+        if ($field === 'status' && $val === 'done' && $p['status'] !== 'done') mail_auto('project_delivered', (int) $p['client_id'], $id);
         $row = one('SELECT * FROM projects WHERE id = ?', [$id]);
         json_out(['ok' => true, 'value' => $val, 'progress' => (int) $row['progress'], 'status' => $row['status'], 'due' => rel_day($row['due_date']), 'tone' => due_tone($row['due_date'], $row['status'] === 'done')]);
 
@@ -196,7 +200,9 @@ switch ($in['action'] ?? '') {
         $pid = (int) ($in['project_id'] ?? 0) ?: null;
         q('INSERT INTO payments (client_id, project_id, label, amount, status, due_date, paid_date, created_at) VALUES (?,?,?,?,?,?,?,?)',
             [$cid, $pid, $label, $amount, $status, $due, $status === 'paid' ? today() : '', now()]);
+        $payId = (int) db()->lastInsertId();
         log_activity($cid, 'payment', ($status === 'paid' ? 'Payment received: ' : 'Payment added: ') . $label . ', ' . inr($amount));
+        if ($status === 'paid') mail_auto('payment_received', $cid, 0, $payId);
         json_out(['ok' => true, 'url' => 'client.php?id=' . $cid . '#payments', 'message' => 'Payment saved']);
 
     case 'payment.update':
@@ -206,7 +212,7 @@ switch ($in['action'] ?? '') {
         q("UPDATE payments SET $field = ? WHERE id = ?", [$val, $id]);
         if ($field === 'status') {
             q('UPDATE payments SET paid_date = ? WHERE id = ?', [$val === 'paid' ? today() : '', $id]);
-            if ($val === 'paid' && $p['status'] !== 'paid') log_activity((int) $p['client_id'], 'payment', 'Payment received: ' . $p['label'] . ', ' . inr($p['amount']));
+            if ($val === 'paid' && $p['status'] !== 'paid') { log_activity((int) $p['client_id'], 'payment', 'Payment received: ' . $p['label'] . ', ' . inr($p['amount'])); mail_auto('payment_received', (int) $p['client_id'], 0, $id); }
         }
         json_out(['ok' => true, 'value' => $val]);
 
@@ -223,6 +229,18 @@ switch ($in['action'] ?? '') {
         log_activity($cid, $kind, $body);
         q('UPDATE clients SET updated_at = ? WHERE id = ?', [now(), $cid]);
         json_out(['ok' => true, 'message' => SK_LOG_KINDS[$kind] . ' saved']);
+
+    /* ---------------- client emails ---------------- */
+    case 'email.send':
+        $cid = (int) ($in['client_id'] ?? 0); $c = need('clients', $cid);
+        $tpl = (string) ($in['template'] ?? '');
+        if (!isset(mail_templates()[$tpl])) bad('Choose an email to send.');
+        $to = trim((string) ($in['to'] ?? '')) ?: (string) $c['email'];
+        if (!filter_var($to, FILTER_VALIDATE_EMAIL)) bad('Add a valid email address for this client first.');
+        if (!mail_enabled()) bad('Email sending is not set up yet. Ask your developer to add the mail settings in config.php.');
+        $r = mail_to_client($tpl, $cid, (int) ($in['project_id'] ?? 0), (int) ($in['payment_id'] ?? 0), [], $to);
+        if (!$r['ok']) bad($r['error']);
+        json_out(['ok' => true, 'message' => 'Email sent to ' . $to]);
 
     case 'note.delete':
         $n = need('activity', $id);

@@ -11,7 +11,7 @@ declare(strict_types=1);
 if (realpath((string) ($_SERVER['SCRIPT_FILENAME'] ?? '')) === __FILE__) { http_response_code(404); exit; }
 define('SK', 1);
 
-$CFG = ['brand' => 'Sankruv Media', 'app' => 'Client Hub', 'tz' => 'Asia/Kolkata', 'data_dir' => '', 'site_url' => '../index.html', 'setup_key' => '', 'reset_key' => ''];
+$CFG = ['brand' => 'Sankruv Media', 'app' => 'Client Hub', 'tz' => 'Asia/Kolkata', 'data_dir' => '', 'site_url' => '../index.html', 'setup_key' => '', 'reset_key' => '', 'public_url' => 'https://www.sankruvmedia.com/', 'mail' => []];
 if (is_file(__DIR__ . '/config.php')) { $CFG = array_merge($CFG, (array) require __DIR__ . '/config.php'); }
 date_default_timezone_set($CFG['tz']);
 
@@ -324,6 +324,7 @@ function ic(string $name, string $cls = 'i'): string
         'chat' => '<path d="M4 5h16v11H9l-5 4z"/>',
         'menu' => '<path d="M4 7h16M4 12h16M4 17h16"/>',
         'more' => '<circle cx="5" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="19" cy="12" r="1.4" fill="currentColor"/>',
+        'send' => '<path d="M21 3L10 14M21 3l-7 18-4-7-7-4 18-7z"/>',
         'eye' => '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
         'lock' => '<rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
         'trend' => '<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>',
@@ -341,3 +342,4 @@ function chip(string $label, string $tone): string { return '<span class="chip t
 function status_tone(string $s): string { return ['lead' => 'lead', 'active' => 'ok', 'on_hold' => 'warn', 'completed' => 'calm', 'archived' => 'mute', 'planned' => 'calm', 'in_progress' => 'lead', 'review' => 'warn', 'done' => 'ok', 'paused' => 'mute'][$s] ?? 'mute'; }
 
 sk_headers(basename((string) ($_SERVER['SCRIPT_NAME'] ?? '')) !== 'api.php' && basename((string) ($_SERVER['SCRIPT_NAME'] ?? '')) !== 'lead.php');
+require __DIR__ . '/_mail.php';

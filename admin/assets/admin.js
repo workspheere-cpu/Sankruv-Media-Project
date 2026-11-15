@@ -50,18 +50,23 @@
 
   /* ---------- menus and dialogs ---------- */
   const closeMenus = except => $$('.menu').forEach(m => { if (m !== except) m.hidden = true; });
-  function openDialog(id) {
+  function openDialog(id, opener) {
     const d = document.getElementById(id); if (!d) return;
     closeMenus();
     if (id === 'palette') return openPalette();
     const err = d.querySelector('.dlg-err'); if (err) err.textContent = '';
+    /* an opener can prefill fields: data-set='{"template":"payment-received","payment_id":"4"}' */
+    let preset = null;
+    try { preset = opener && opener.dataset.set ? JSON.parse(opener.dataset.set) : null; } catch (x) {}
+    if (preset) Object.keys(preset).forEach(k => { const f = d.querySelector('[name="' + k + '"]'); if (f) f.value = preset[k]; });
+    d.dispatchEvent(new CustomEvent('dlg-open'));
     d.showModal();
     const f = d.querySelector('input:not([type=hidden]):not([type=date]):not([type=time]), textarea');
-    if (f && matchMedia('(hover:hover)').matches) setTimeout(() => f.focus(), 40);
+    if (f && matchMedia('(hover:hover)').matches) f.focus();
   }
   document.addEventListener('click', e => {
     const t = e.target;
-    const op = t.closest('[data-open]'); if (op) { e.preventDefault(); openDialog(op.dataset.open); return; }
+    const op = t.closest('[data-open]'); if (op) { e.preventDefault(); openDialog(op.dataset.open, op); return; }
     const cl = t.closest('[data-close]'); if (cl) { cl.closest('dialog').close(); return; }
     const mb = t.closest('[data-menu]');
     if (mb) { const m = document.getElementById(mb.dataset.menu); closeMenus(m); m.hidden = !m.hidden; mb.setAttribute('aria-expanded', String(!m.hidden)); return; }
@@ -415,6 +420,21 @@
     const step = t => { const p = Math.min(1, (t - t0) / dur); el.textContent = Math.round(end * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(step); };
     el.textContent = '0'; requestAnimationFrame(step);
   });
+
+  /* ---------- client email dialog: description and preview link follow the choices ---------- */
+  const em = $('#dlg-email');
+  if (em) {
+    const tpl = $('#em-tpl'), prev = $('#em-prev'), about = $('#em-about');
+    const sync = () => {
+      const o = tpl.options[tpl.selectedIndex];
+      about.textContent = o ? o.dataset.about : '';
+      const q = new URLSearchParams({ preview: tpl.value, client: prev.dataset.client, project: $('#em-proj').value, payment: $('#em-pay').value });
+      prev.href = 'emails.php?' + q.toString();
+    };
+    em.addEventListener('change', sync);
+    em.addEventListener('dlg-open', sync);
+    sync();
+  }
 
   /* ---------- installable app: register the service worker ---------- */
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
