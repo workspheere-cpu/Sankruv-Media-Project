@@ -1,0 +1,26 @@
+/* Client Hub (React): extras on top of hub.css */
+#hub{display:contents}
+.hub-boot{position:fixed;inset:0;display:grid;place-content:center;justify-items:center;gap:18px;background:#0b0e18}
+.hub-boot img{border-radius:20px;box-shadow:0 0 40px -6px rgba(72,190,192,.7);animation:hb 1.4s ease-in-out infinite}
+.hub-boot span{width:120px;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,#48bec0,transparent) -120px 0/120px 100% no-repeat rgba(255,255,255,.1);animation:hbl 1.1s linear infinite}
+@keyframes hb{50%{transform:scale(1.06)}}
+@keyframes hbl{to{background-position:120px 0}}
+.skel{display:grid;gap:14px;padding-top:10px}
+.skel i{display:block;height:120px;border-radius:var(--r);background:linear-gradient(100deg,#e9edf1 30%,#f6f8fa 50%,#e9edf1 70%) 0 0/300% 100%;animation:sk 1.2s linear infinite}
+.skel i:first-child{height:190px}
+@keyframes sk{to{background-position:-300% 0}}
+.menu-host{position:relative}
+.tabs-m .menu-host{display:grid;justify-items:center}
+.tabs-m button.fab{border:0;cursor:pointer}
+.tabs-m a{position:relative}
+.tabs-m a.on{color:var(--teal)}
+.tabs-m a.on::before{content:"";position:absolute;top:3px;left:50%;width:52px;height:30px;margin-left:-26px;border-radius:999px;background:var(--teal-bg);z-index:-1}
+.tm-dot{position:absolute;top:4px;left:calc(50% + 8px);width:8px;height:8px;border-radius:50%;background:var(--bad);box-shadow:0 0 0 2px #fff}
+.ccard{animation:rise .5s var(--e) both}
+.em-prev{justify-self:start}
+.prof-id h1 .inl{font:inherit;height:44px;max-width:520px}
+.side-nav a,.tabs-m a,.kpi,.attn-i,.wd{-webkit-tap-highlight-color:transparent}
+.content{view-transition-name:none}
+.dash>*{animation:rise .5s var(--e) both}
+.dash>*:nth-child(2){animation-delay:.04s}.dash>*:nth-child(3){animation-delay:.08s}.dash>*:nth-child(4){animation-delay:.12s}.dash>*:nth-child(5){animation-delay:.16s}.dash>*:nth-child(6){animation-delay:.2s}.dash>*:nth-child(7){animation-delay:.24s}.dash>*:nth-child(8){animation-delay:.28s}
+@media (prefers-reduced-motion:reduce){.ccard,.dash>*,.hub-boot img,.hub-boot span,.skel i{animation:none}}

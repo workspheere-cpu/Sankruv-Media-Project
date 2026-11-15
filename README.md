@@ -34,6 +34,17 @@ line to `content/videos.json` (`src` is `youtube`, `drive` for one Drive file, `
 `link`). Drive files and folders must be shared as "Anyone with the link" or they will not play on the site.
 The Client Hub in `admin/` stays PHP and is copied into the build unchanged.
 
+### Client Hub in React
+
+The Client Hub screens are a React app too: source in `react/admin/` (`main.jsx` shell, dialogs and search; `views.jsx`
+dashboard, clients, projects board, reminders, payments, emails; `client.jsx` the client profile; `core.jsx` helpers).
+`npm run build` bundles it into `admin/assets/hubapp.js`, which is committed so the hub works on a PHP host without Node.
+
+- `admin/app.php` checks the sign-in and loads the app. `admin/data.php` serves read-only JSON. Changes go through `admin/api.php`.
+- Sign-in, first-run setup, password reset and the Team page stay as PHP pages, because passwords are handled on the server.
+- `admin/index.php` opens the React hub by default. `index.php?classic=1` switches to the older PHP screens for the session
+  (`?classic=0` switches back), or set `'ui' => 'classic'` in `admin/config.php`.
+
 The original static generator (`build.py`, `src/`) is kept untouched as a fallback until the React version goes live.
 
 ## Quick start

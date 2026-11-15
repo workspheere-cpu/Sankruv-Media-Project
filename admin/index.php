@@ -4,6 +4,9 @@ require __DIR__ . '/_boot.php';
 sk_session();
 if (!users_exist()) redirect('setup.php');
 $me = require_login();
+/* The React hub (app.php) is the default. index.php?classic=1 keeps these PHP pages for this session; ?classic=0 goes back. */
+if (isset($_GET['classic'])) $_SESSION['classic'] = $_GET['classic'] === '1';
+if (empty($_SESSION['classic']) && ($CFG['ui'] ?? 'react') === 'react' && is_file(__DIR__ . '/assets/hubapp.js')) redirect('app.php');
 require __DIR__ . '/_layout.php';
 
 $t = today(); $in7 = date('Y-m-d', strtotime('+7 day')); $in30 = date('Y-m-d', strtotime('+30 day'));

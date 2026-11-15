@@ -178,7 +178,7 @@ function csrf_verify(): void
         exit('Your session expired. Go back, refresh the page and try again.');
     }
 }
-function is_api(): bool { return basename((string) ($_SERVER['SCRIPT_NAME'] ?? '')) === 'api.php'; }
+function is_api(): bool { return in_array(basename((string) ($_SERVER['SCRIPT_NAME'] ?? '')), ['api.php', 'data.php'], true); }
 function json_out(array $data, int $code = 200): void
 {
     http_response_code($code);

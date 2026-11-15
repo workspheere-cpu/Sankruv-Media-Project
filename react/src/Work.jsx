@@ -43,6 +43,7 @@ function Card({ v, i, onOpen }) {
 
 function Player({ list, v, onClose, onGo }) {
   const box = useRef(null);
+  const { root } = useSite();
   const i = list.indexOf(v);
   useEffect(() => {
     const prev = document.activeElement;
@@ -58,6 +59,7 @@ function Player({ list, v, onClose, onGo }) {
         <div className="vp-frame"><iframe key={v.id} src={embed(v)} title={v.title} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" referrerPolicy="strict-origin-when-cross-origin"></iframe></div>
         <div className="vp-bar">
           <span className="vp-t"><b>{v.title}</b><small>{v.kind}, {i + 1} of {list.length}</small></span>
+          <a className="btn hot sm vp-cta" href={`${root}contact.html?service=shoots`}><span>Get a film like this</span><Arrow /></a>
           <a className="vp-out" href={outside(v)} target="_blank" rel="noopener">Open{v.src === 'youtube' ? ' on YouTube' : ' in Drive'}<Arrow /></a>
           <button className="vp-nav prev" type="button" onClick={() => onGo(-1)} aria-label="Previous film"><Arrow /></button>
           <button className="vp-nav next" type="button" onClick={() => onGo(1)} aria-label="Next film"><Arrow /></button>
@@ -68,8 +70,19 @@ function Player({ list, v, onClose, onGo }) {
   );
 }
 
-function useWall(list) {
-  const [open, setOpen] = useState(null);
+const slug = v => v.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+function useWall(list, deep) {
+  const [open, setOpenRaw] = useState(null);
+  const setOpen = useCallback(x => setOpenRaw(prev => {
+    const next = typeof x === 'function' ? x(prev) : x;
+    if (deep) try { history.replaceState(null, '', next ? '#film=' + slug(next) : location.pathname + location.search + '#films'); } catch (e) {}
+    return next;
+  }), [deep]);
+  useEffect(() => {
+    if (!deep) return;
+    const m = /#film=([\w-]+)/.exec(location.hash), hit = m && VIDEOS.find(v => slug(v) === m[1] && v.src !== 'link');
+    if (hit) setOpenRaw(hit);
+  }, [deep]);
   const playable = list.filter(v => v.src !== 'link');
   const close = useCallback(() => setOpen(null), []);
   const go = useCallback(d => setOpen(cur => { const k = playable.indexOf(cur); return playable[(k + d + playable.length) % playable.length]; }), [playable.length, playable[0]]);
@@ -79,20 +92,27 @@ function useWall(list) {
 
 /* Full wall on the Work page */
 export function VideoWall() {
+  const { root } = useSite();
   const [cat, setCat] = useState('all');
   const list = cat === 'all' ? VIDEOS : VIDEOS.filter(v => v.cat === cat);
-  const [open, player] = useWall(list);
+  const [open, player] = useWall(list, true);
   return (
     <section className="films" id="films" data-fx="3.6 -0.4 0.5 0 0 0.25 6">
       <div className="wrap">
         <div className="sec-head">
           <h2 className="sw">Films and <span className="t">videos</span></h2>
           <p className="lead rv">Commercials, brand shoots, music videos, weddings and reels shot and edited by our team. Select a film to watch it here.</p>
+          <ul className="vfacts rv"><li><b>{VIDEOS.length}</b> films and collections</li><li><b>{CATS.length - 1}</b> kinds of production</li><li><b>1</b> in-house team, script to final edit</li></ul>
         </div>
         <div className="vfilter" role="group" aria-label="Filter films by type">
           {CATS.map(([k, label]) => <button type="button" key={k} className={k === cat ? 'on' : ''} aria-pressed={k === cat} onClick={() => setCat(k)}>{label}<small>{k === 'all' ? VIDEOS.length : VIDEOS.filter(v => v.cat === k).length}</small></button>)}
         </div>
-        <div className="vwall" key={cat}>{list.map((v, i) => <Card v={v} i={i} onOpen={open} key={v.title} />)}</div>
+        <div className={'vwall' + (cat === 'all' ? ' lead' : '')} key={cat}>
+          {list.map((v, i) => <Card v={v} i={i} onOpen={open} key={v.title} />)}
+          <a className="vcta" href={`${root}contact.html?service=shoots`} style={{ '--i': list.length % 12 }}>
+            <span className="d">Your film could be next</span><span>Tell us the idea. We plan, shoot and edit it, and send a free quote.</span>
+            <span className="btn hot"><span>Plan my shoot</span><Arrow /></span></a>
+        </div>
       </div>
       {player}
     </section>

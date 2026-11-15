@@ -67,6 +67,11 @@ async function main() {
   fs.cpSync(path.join(ROOT, 'assets'), path.join(OUT, 'assets'), { recursive: true });
   fs.rmSync(path.join(OUT, 'assets/js'), { recursive: true, force: true }); fs.mkdirSync(path.join(OUT, 'assets/js'));
   fs.copyFileSync(path.join(HERE, 'src/react.css'), path.join(OUT, 'assets/css/react.css'));
+  /* Client Hub (React): bundle react/admin into admin/assets so the PHP hub can serve it */
+  if (fs.existsSync(path.join(ROOT, 'admin'))) {
+    await esbuild.build({ ...common, entryPoints: [path.join(HERE, 'admin/main.jsx')], outfile: path.join(ROOT, 'admin/assets/hubapp.js'), minify: true, format: 'iife', target: 'es2019', legalComments: 'none' });
+    fs.copyFileSync(path.join(HERE, 'admin/hubapp.css'), path.join(ROOT, 'admin/assets/hubapp.css'));
+  }
   if (!args.includes('--no-admin') && fs.existsSync(path.join(ROOT, 'admin'))) {
     fs.cpSync(path.join(ROOT, 'admin'), path.join(OUT, 'admin'), { recursive: true, filter: s => !/(^|[\\/])(data|config\.php|setup-code\.txt)$/.test(s) && !/\.sqlite/.test(s) });
   }
@@ -166,7 +171,9 @@ ${extraHead}
       else if (kind === 'contact') ld.push({ '@type': 'ContactPage', url: BASE + file, name: meta.title, about: { '@id': BASE + '#org' } });
       else if (kind === 'projects') ld.push({ '@type': 'CollectionPage', url: BASE + file, name: meta.title, hasPart: [
         ...PROJECTS.map(p => ({ '@type': 'CreativeWork', name: p.name, description: p.summary, creator: { '@id': BASE + '#org' } })),
-        ...VIDEOS.map(v => ({ '@type': 'CreativeWork', name: v.title, genre: v.kind, creator: { '@id': BASE + '#org' } }))] });
+        ...VIDEOS.map(v => ({ '@type': 'CreativeWork', name: v.title, genre: v.kind, creator: { '@id': BASE + '#org' } }))] },
+        { '@type': 'ItemList', name: 'Films and videos by Sankruv Media', numberOfItems: VIDEOS.length, itemListElement: VIDEOS.map((v, i) => ({ '@type': 'ListItem', position: i + 1, name: `${v.title} (${v.kind})`,
+          url: v.src === 'link' ? v.url : `${BASE}${file}#film=${v.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}` })) });
       else if (kind === 'blog') ld.push({ '@type': 'Blog', '@id': BASE + 'blog.html#blog', url: BASE + file, name: 'Sankruv Media Blog', publisher: { '@id': BASE + '#org' },
         blogPost: posts.map(p => ({ '@type': 'BlogPosting', headline: p.title, url: `${BASE}blog/${p.slug}.html`, datePublished: p.date })) });
     }
