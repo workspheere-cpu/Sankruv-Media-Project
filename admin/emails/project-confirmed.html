@@ -1,19 +1,20 @@
 <!--
 subject: Confirmed: {{project_title}}
-preheader: Your project is confirmed. Deadline {{due_date}}.
+preheader: Your project is confirmed. Delivery by {{due_date}}.
 tag: Project confirmed
+headline: Your project is confirmed
+subline: {{project_title}}
 title: Confirm a new project
 about: Confirms a project with its service, dates and value. Choose the project when sending.
 -->
-<h1 style="margin:0 0 12px;font:bold 24px/1.25 Arial,Helvetica,sans-serif;color:#101828;">Your project is confirmed</h1>
-<p style="margin:0 0 16px;">Hi {{first_name}}, thank you for the go-ahead. We have scheduled your project and the team is ready to begin.</p>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 22px;background:#f4fbfb;border:1px solid #cdeced;border-radius:14px;">
-<tr><td style="padding:12px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #e1f3f3;">Project</td><td align="right" style="padding:12px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #e1f3f3;">{{project_title}}</td></tr>
-<tr><td style="padding:12px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #e1f3f3;">Service</td><td align="right" style="padding:12px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #e1f3f3;">{{project_service}}</td></tr>
-<tr><td style="padding:12px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #e1f3f3;">Start date</td><td align="right" style="padding:12px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #e1f3f3;">{{start_date}}</td></tr>
-<tr><td style="padding:12px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #e1f3f3;">Delivery by</td><td align="right" style="padding:12px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #e1f3f3;">{{due_date}}</td></tr>
-{{#project_value}}<tr><td style="padding:12px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #e1f3f3;">Project value</td><td align="right" style="padding:12px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #e1f3f3;">{{project_value}}</td></tr>{{/project_value}}
+<p style="margin:0 0 16px;font:16px/1.65 Arial,Helvetica,sans-serif;color:#344054;">Hi {{first_name}}, thank you for the go-ahead. We have scheduled your project and the team is ready to begin.</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 22px;border-collapse:separate;border:1px solid #cdeced;border-radius:16px;background:#f4fbfb;">
+<tr><td style="padding:13px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #dff2f2;">Project</td><td align="right" style="padding:13px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #dff2f2;">{{project_title}}</td></tr>
+<tr><td style="padding:13px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #dff2f2;">Service</td><td align="right" style="padding:13px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #dff2f2;">{{project_service}}</td></tr>
+<tr><td style="padding:13px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #dff2f2;">Start date</td><td align="right" style="padding:13px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #dff2f2;">{{start_date}}</td></tr>
+<tr><td style="padding:13px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #dff2f2;">Delivery by</td><td align="right" style="padding:13px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #dff2f2;">{{due_date}}</td></tr>
+{{#project_value}}<tr><td style="padding:13px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;">Project value</td><td align="right" style="padding:13px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;">{{project_value}}</td></tr>{{/project_value}}
 </table>
-{{#project_details}}<p style="margin:0 0 16px;"><b style="color:#101828;">Scope:</b> {{project_details}}</p>{{/project_details}}
-<p style="margin:0 0 16px;">We will share progress at every key step. If anything changes on your side, just reply to this email.</p>
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 22px;"><tr><td style="border-radius:12px;background:#1f9a9c;"><a href="{{whatsapp_url}}" style="display:inline-block;padding:14px 24px;font:bold 15px Arial,Helvetica,sans-serif;color:#ffffff;text-decoration:none;border-radius:12px;">Talk to us on WhatsApp</a></td></tr></table>
+{{#project_details}}<p style="margin:22px 0 8px;font:bold 15px/1.4 Arial,Helvetica,sans-serif;color:#101828;">Scope</p><p style="margin:0 0 16px;font:16px/1.65 Arial,Helvetica,sans-serif;color:#344054;">{{project_details}}</p>{{/project_details}}
+<p style="margin:0 0 16px;font:16px/1.65 Arial,Helvetica,sans-serif;color:#344054;">We will share progress at every key step. If anything changes on your side, just reply to this email.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 24px;"><tr><td style="border-radius:12px;background:#1f9a9c;background-image:linear-gradient(180deg,#3fc0c2,#1f9a9c);box-shadow:0 8px 18px -8px rgba(31,154,156,.7);"><a href="{{whatsapp_url}}" style="display:inline-block;padding:14px 26px;font:bold 15px Arial,Helvetica,sans-serif;color:#ffffff;text-decoration:none;border-radius:12px;">Talk to us on WhatsApp &rarr;</a></td></tr></table>

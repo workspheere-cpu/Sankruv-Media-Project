@@ -428,10 +428,11 @@
     const sync = () => {
       const o = tpl.options[tpl.selectedIndex];
       about.textContent = o ? o.dataset.about : '';
-      const q = new URLSearchParams({ preview: tpl.value, client: prev.dataset.client, project: $('#em-proj').value, payment: $('#em-pay').value });
+      const q = new URLSearchParams({ preview: tpl.value, client: prev.dataset.client, project: $('#em-proj').value, payment: $('#em-pay').value, note: ($('#em-note') || {}).value || '' });
       prev.href = 'emails.php?' + q.toString();
     };
     em.addEventListener('change', sync);
+    em.addEventListener('input', e => { if (e.target.id === 'em-note') sync(); });
     em.addEventListener('dlg-open', sync);
     sync();
   }
@@ -448,6 +449,58 @@
     try { if (el && localStorage.getItem('sk-hide-' + id)) el.hidden = true; } catch (x) {}
     b.addEventListener('click', () => { if (el) el.hidden = true; try { localStorage.setItem('sk-hide-' + id, '1'); } catch (x) {} });
   });
+
+  /* ---------- dashboard: 3D brand core, entrance, tilt ---------- */
+  const reduceMo = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (document.body.classList.contains('pg-dash') && !reduceMo) {
+    $$('.content > *, .dash > *').forEach((el, i) => { el.style.animationDelay = Math.min(i, 12) * 45 + 'ms'; el.classList.add('rise'); });
+  }
+  if (matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMo) {
+    $$('.kpi, .mh-stats a').forEach(el => {
+      el.classList.add('tilt');
+      el.addEventListener('pointermove', e => {
+        const r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+        el.style.transform = `perspective(600px) rotateX(${(-y * 6).toFixed(2)}deg) rotateY(${(x * 8).toFixed(2)}deg) translateY(-2px)`;
+      });
+      el.addEventListener('pointerleave', () => { el.style.transform = ''; });
+    });
+  }
+  const core = $('.mh-core');
+  if (core) (function () {
+    const gl = core.getContext('webgl', { antialias: false, alpha: true, premultipliedAlpha: false });
+    if (!gl) return;
+    const fs = ['precision mediump float;uniform vec2 R;uniform float T;uniform vec2 M;',
+      'const vec3 TD=vec3(.05,.17,.18);const vec3 TM=vec3(.14,.45,.46);const vec3 TL=vec3(.36,.82,.82);',
+      'float map(vec3 q){float n=sin(q.x*2.1+T*.9)*sin(q.y*2.5+T*1.1)*sin(q.z*1.9+T*.7)+.5*sin(q.x*4.3-T*1.3)*sin(q.y*3.7+T*.6);',
+      ' float d=length(q)-1.-n*.11;for(int i=0;i<3;i++){float fi=float(i);float a=T*(.6+fi*.15)+fi*2.1;d=min(d,length(q-vec3(cos(a)*1.45,sin(a*.8+fi)*.45,sin(a)*1.45))-.07-.02*fi);}return d;}',
+      'void main(){vec2 uv=(gl_FragCoord.xy*2.-R)/R.y;vec3 ro=vec3(0.,0.,3.7),rd=normalize(vec3(uv,-2.));float t=2.;float a=0.;vec3 col=vec3(0.);',
+      ' for(int i=0;i<56;i++){vec3 p=ro+rd*t;float d=map(p);if(d<.004){vec2 e=vec2(.005,0.);vec3 n=normalize(vec3(map(p+e.xyy)-map(p-e.xyy),map(p+e.yxy)-map(p-e.yxy),map(p+e.yyx)-map(p-e.yyx)));',
+      '  vec3 l=normalize(vec3(.5+M.x,.85-M.y,.6));float df=max(dot(n,l),0.);float fr=pow(1.-max(dot(n,-rd),0.),3.);vec3 r=reflect(rd,n);',
+      '  col=mix(TD,TM,df);col=mix(col,TL,pow(df,3.)*.6);col+=TL*fr*.8;col+=vec3(.75,.95,.95)*smoothstep(.55,.95,r.y)*.16;col+=pow(max(dot(reflect(-l,n),-rd),0.),50.)*.6;a=1.;break;}',
+      '  t+=d*.85;if(t>9.)break;}',
+      ' gl_FragColor=vec4(col*a,a);}'].join('\n');
+    const sh = (t, src) => { const o = gl.createShader(t); gl.shaderSource(o, src); gl.compileShader(o); return gl.getShaderParameter(o, gl.COMPILE_STATUS) ? o : null; };
+    const v = sh(gl.VERTEX_SHADER, 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}'), f = sh(gl.FRAGMENT_SHADER, fs);
+    if (!v || !f) return;
+    const pr = gl.createProgram(); gl.attachShader(pr, v); gl.attachShader(pr, f); gl.linkProgram(pr); gl.useProgram(pr);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer()); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    const uR = gl.getUniformLocation(pr, 'R'), uT = gl.getUniformLocation(pr, 'T'), uM = gl.getUniformLocation(pr, 'M');
+    let W = 0, H = 0, visible = true, raf = 0, mx = 0, my = 0, sx = 0, sy = 0;
+    const size = () => { const s = Math.min(devicePixelRatio || 1, 2); W = Math.round(core.clientWidth * s); H = Math.round(core.clientHeight * s); core.width = W; core.height = H; gl.viewport(0, 0, W, H); };
+    size(); addEventListener('resize', size);
+    addEventListener('pointermove', e => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; }, { passive: true });
+    const draw = ms => {
+      sx += (mx - sx) * .06; sy += (my - sy) * .06;
+      gl.uniform2f(uR, W, H); gl.uniform1f(uT, reduceMo ? 8 : ms / 1000); gl.uniform2f(uM, sx, sy);
+      gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.TRIANGLES, 0, 3);
+    };
+    const loop = ms => { draw(ms); raf = visible && !document.hidden ? requestAnimationFrame(loop) : 0; };
+    const kick = () => { if (!raf && visible && !document.hidden && !reduceMo) raf = requestAnimationFrame(loop); };
+    if ('IntersectionObserver' in window) new IntersectionObserver(es => { visible = es[0].isIntersecting; kick(); }).observe(core);
+    document.addEventListener('visibilitychange', kick);
+    if (reduceMo) draw(0); else kick();
+  })();
 
   /* ---------- installable app: register the service worker ---------- */
   if ('serviceWorker' in navigator && location.protocol === 'https:') {

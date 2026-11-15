@@ -238,7 +238,8 @@ switch ($in['action'] ?? '') {
         $to = trim((string) ($in['to'] ?? '')) ?: (string) $c['email'];
         if (!filter_var($to, FILTER_VALIDATE_EMAIL)) bad('Add a valid email address for this client first.');
         if (!mail_enabled()) bad('Email sending is not set up yet. Ask your developer to add the mail settings in config.php.');
-        $r = mail_to_client($tpl, $cid, (int) ($in['project_id'] ?? 0), (int) ($in['payment_id'] ?? 0), [], $to);
+        $note = mb_substr(trim(strip_tags((string) ($in['note'] ?? ''))), 0, 1000);
+        $r = mail_to_client($tpl, $cid, (int) ($in['project_id'] ?? 0), (int) ($in['payment_id'] ?? 0), ['note' => $note, 'sender' => (string) ($me['name'] ?? '')], $to);
         if (!$r['ok']) bad($r['error']);
         json_out(['ok' => true, 'message' => 'Email sent to ' . $to]);
 

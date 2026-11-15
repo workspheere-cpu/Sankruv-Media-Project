@@ -2,18 +2,18 @@
 subject: Payment due: {{payment_label}} ({{amount}})
 preheader: {{amount}} is due on {{payment_due}}. Payment details inside.
 tag: Payment request
+headline: Payment request
+subline: {{payment_label}}
 title: Request a payment
 about: Asks the client to pay an invoice, advance or retainer. Choose the payment when sending.
 -->
-<h1 style="margin:0 0 12px;font:bold 24px/1.25 Arial,Helvetica,sans-serif;color:#101828;">Payment request</h1>
-<p style="margin:0 0 16px;">Hi {{first_name}}, here are the details for your upcoming payment to {{brand}}.</p>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 22px;background:#f4fbfb;border:1px solid #cdeced;border-radius:14px;">
-<tr><td style="padding:12px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #e1f3f3;">For</td><td align="right" style="padding:12px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #e1f3f3;">{{payment_label}}</td></tr>
-<tr><td style="padding:12px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #e1f3f3;">Amount</td><td align="right" style="padding:12px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #e1f3f3;">{{amount}}</td></tr>
-<tr><td style="padding:12px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #e1f3f3;">Due date</td><td align="right" style="padding:12px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #e1f3f3;">{{payment_due}}</td></tr>
-<tr><td style="padding:12px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #e1f3f3;">Reference</td><td align="right" style="padding:12px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #e1f3f3;">{{invoice_no}}</td></tr>
+<p style="margin:0 0 16px;font:16px/1.65 Arial,Helvetica,sans-serif;color:#344054;">Hi {{first_name}}, here are the details for your upcoming payment to {{brand}}.</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:4px 0 20px;"><tr><td align="center" style="padding:22px 16px;border-radius:18px;background:#0b0e18;background-image:linear-gradient(135deg,#132029,#0b0e18);"><p style="margin:0;font:bold 12px Arial,Helvetica,sans-serif;letter-spacing:.04em;color:#8be7e8;">AMOUNT DUE</p><p style="margin:6px 0 0;font:bold 34px/1.1 Arial,Helvetica,sans-serif;color:#ffffff;">{{amount}}</p><p style="margin:6px 0 0;font:13px Arial,Helvetica,sans-serif;color:#9aa6b2;">Due on {{payment_due}}</p></td></tr></table>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 22px;border-collapse:separate;border:1px solid #cdeced;border-radius:16px;background:#f4fbfb;">
+<tr><td style="padding:13px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;border-bottom:1px solid #dff2f2;">For</td><td align="right" style="padding:13px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;border-bottom:1px solid #dff2f2;">{{payment_label}}</td></tr>
+<tr><td style="padding:13px 18px;font:14px Arial,Helvetica,sans-serif;color:#667085;">Reference</td><td align="right" style="padding:13px 18px;font:bold 15px Arial,Helvetica,sans-serif;color:#101828;">{{invoice_no}}</td></tr>
 </table>
-<p style="margin:0 0 6px;font-weight:bold;color:#101828;">How to pay</p>
-<p style="margin:0 0 16px;">{{payment_info}}</p>
-<p style="margin:0 0 16px;">Please mention <b>{{invoice_no}}</b> with your payment. Once it arrives, we will send you a receipt.</p>
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 22px;"><tr><td style="border-radius:12px;background:#1f9a9c;"><a href="{{whatsapp_url}}" style="display:inline-block;padding:14px 24px;font:bold 15px Arial,Helvetica,sans-serif;color:#ffffff;text-decoration:none;border-radius:12px;">Questions? WhatsApp us</a></td></tr></table>
+<p style="margin:22px 0 8px;font:bold 15px/1.4 Arial,Helvetica,sans-serif;color:#101828;">How to pay</p>
+<p style="margin:0 0 16px;font:16px/1.65 Arial,Helvetica,sans-serif;color:#344054;">{{payment_info}}</p>
+<p style="margin:0 0 16px;font:16px/1.65 Arial,Helvetica,sans-serif;color:#344054;">Please mention <b style="color:#101828;">{{invoice_no}}</b> with your payment. We will send a receipt as soon as it arrives.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 24px;"><tr><td style="border-radius:12px;background:#1f9a9c;background-image:linear-gradient(180deg,#3fc0c2,#1f9a9c);box-shadow:0 8px 18px -8px rgba(31,154,156,.7);"><a href="{{whatsapp_url}}" style="display:inline-block;padding:14px 26px;font:bold 15px Arial,Helvetica,sans-serif;color:#ffffff;text-decoration:none;border-radius:12px;">Questions? WhatsApp us &rarr;</a></td></tr></table>

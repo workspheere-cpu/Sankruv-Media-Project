@@ -47,14 +47,14 @@ function mail_templates(): array
         if ($slug[0] === '_') continue;
         $all[$slug] = mail_meta((string) file_get_contents($f)) + ['slug' => $slug];
     }
-    $order = ['enquiry-received', 'welcome', 'project-confirmed', 'payment-request', 'payment-reminder', 'payment-received', 'project-delivered'];
+    $order = ['enquiry-received', 'welcome', 'proposal-sent', 'project-confirmed', 'meeting-confirmed', 'payment-request', 'payment-reminder', 'payment-received', 'renewal-reminder', 'monthly-report', 'project-delivered', 'feedback-request'];
     $pos = fn($k) => ($i = array_search($k, $order, true)) === false ? 99 : $i;
     uksort($all, fn($a, $b) => $pos($a) <=> $pos($b));
     return $all;
 }
 function mail_meta(string $src): array
 {
-    $m = ['subject' => '', 'preheader' => '', 'tag' => '', 'title' => '', 'about' => ''];
+    $m = ['subject' => '', 'preheader' => '', 'tag' => '', 'headline' => '', 'subline' => '', 'title' => '', 'about' => ''];
     if (preg_match('/^<!--(.*?)-->/s', $src, $x)) {
         foreach (explode("\n", $x[1]) as $line) {
             if (preg_match('/^\s*(\w+):\s*(.+)$/', $line, $kv) && array_key_exists($kv[1], $m)) $m[$kv[1]] = trim($kv[2]);
@@ -66,7 +66,9 @@ function mail_meta(string $src): array
 /** Fill a template string. Values are escaped; sections show only for non-empty values. */
 function mail_fill(string $tpl, array $v, bool $html = true): string
 {
-    $tpl = preg_replace_callback('/\{\{#(\w+)\}\}(.*?)\{\{\/\1\}\}/s', fn($m) => trim((string) ($v[$m[1]] ?? '')) !== '' ? $m[2] : '', $tpl);
+    for ($i = 0; $i < 4 && str_contains($tpl, '{{#'); $i++) {
+        $tpl = preg_replace_callback('/\{\{#(\w+)\}\}(.*?)\{\{\/\1\}\}/s', fn($m) => trim((string) ($v[$m[1]] ?? '')) !== '' ? $m[2] : '', $tpl);
+    }
     return preg_replace_callback('/\{\{(\w+)\}\}/', function ($m) use ($v, $html) {
         $val = (string) ($v[$m[1]] ?? '');
         return $html ? nl2br(htmlspecialchars($val, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'), false) : $val;
@@ -81,11 +83,16 @@ function mail_render(string $slug, array $vars): array
     $src = (string) file_get_contents($file);
     $meta = mail_meta($src);
     $vars = $vars + mail_brand_vars();
+    $vars['sender'] = trim((string) ($vars['sender'] ?? '')) ?: $vars['brand'];
+    $vars['month'] = $vars['month'] ?? date('F Y');
+    /* a personal note shows in its own box, unless the template already places it in the body */
+    $vars['note_box'] = str_contains($src, '{{note}}') ? '' : (string) ($vars['note'] ?? '');
     $subject = mail_fill($meta['subject'], $vars, false);
     $body = mail_fill(preg_replace('/^<!--.*?-->\s*/s', '', $src), $vars);
-    $html = mail_fill((string) file_get_contents(__DIR__ . '/emails/_layout.html'), ['subject' => $subject, 'preheader' => mail_fill($meta['preheader'], $vars, false), 'tag' => $meta['tag'], 'content' => '@@CONTENT@@'] + $vars);
+    $html = mail_fill((string) file_get_contents(__DIR__ . '/emails/_layout.html'), ['subject' => $subject, 'preheader' => mail_fill($meta['preheader'], $vars, false), 'tag' => $meta['tag'],
+        'headline' => mail_fill($meta['headline'], $vars, false), 'subline' => mail_fill($meta['subline'], $vars, false), 'content' => '@@CONTENT@@'] + $vars);
     $html = str_replace('@@CONTENT@@', $body, $html);
-    $text = mail_html_to_text($body) . "\n\nWarm regards,\nTeam " . $vars['brand'] . "\n" . $vars['brand_phone'] . ' | ' . $vars['brand_email'] . "\n" . $vars['site_url'];
+    $text = mail_fill($meta['headline'], $vars, false) . "\n\n" . mail_html_to_text($body) . ($vars['note_box'] !== '' ? "\n\nA note from " . $vars['sender'] . ":\n" . $vars['note_box'] : '') . "\n\nWarm regards,\n" . $vars['sender'] . "\nTeam " . $vars['brand'] . "\n" . $vars['brand_phone'] . ' | ' . $vars['brand_email'] . "\n" . $vars['site_url'];
     return [$subject, $html, $text];
 }
 function mail_html_to_text(string $html): string
@@ -111,15 +118,15 @@ function mail_vars(int $clientId, int $projectId = 0, int $paymentId = 0): array
 {
     $c = one('SELECT * FROM clients WHERE id = ?', [$clientId]);
     if (!$c) throw new RuntimeException('Client not found.');
-    $name = trim($c['contact_person'] ?: $c['name']);
+    $person = trim((string) $c['contact_person']);
     $v = [
-        'client_name' => $c['name'], 'first_name' => explode(' ', $name)[0], 'client_company' => $c['company'] ?: $c['name'],
+        'client_name' => $c['name'], 'first_name' => $person !== '' ? explode(' ', $person)[0] : trim((string) $c['name']), 'client_company' => $c['company'] ?: $c['name'],
         'client_email' => $c['email'], 'client_services' => str_replace(',', ', ', (string) $c['services']) ?: 'To be confirmed',
         'reference' => 'SM-L' . str_pad((string) $clientId, 4, '0', STR_PAD_LEFT),
     ];
     if ($projectId) {
         $p = one('SELECT * FROM projects WHERE id = ? AND client_id = ?', [$projectId, $clientId]);
-        if ($p) $v += ['project_title' => $p['title'], 'project_service' => $p['service'] ?: 'As discussed', 'start_date' => $p['start_date'] ? fmt_date($p['start_date']) : 'To be confirmed',
+        if ($p) $v += ['valid_until' => fmt_date(date('Y-m-d', strtotime('+14 day'))), 'project_title' => $p['title'], 'project_service' => $p['service'] ?: 'As discussed', 'start_date' => $p['start_date'] ? fmt_date($p['start_date']) : 'To be confirmed',
             'due_date' => $p['due_date'] ? fmt_date($p['due_date']) : 'To be confirmed', 'project_value' => (int) $p['value'] ? inr($p['value']) : '', 'project_details' => $p['details']];
     }
     if ($paymentId) {
@@ -141,7 +148,8 @@ function mail_sample_vars(): array
         'reference' => 'SM-L0042', 'services' => 'Social Media Management, Web Development & Design', 'timeline' => 'Within a month',
         'message' => 'We are opening a second outlet in Bandra and want a launch campaign plus a new website.',
         'project_title' => 'Diwali reels campaign', 'project_service' => 'Social Media Management', 'start_date' => fmt_date(today()), 'due_date' => fmt_date(date('Y-m-d', strtotime('+21 day'))),
-        'project_value' => inr(45000), 'project_details' => '12 reels, 20 posts and a festive story series.', 'payment_label' => '50% advance for Diwali campaign', 'amount' => inr(22500),
+        'project_value' => inr(45000), 'project_details' => '12 reels, 20 posts and a festive story series.', 'valid_until' => fmt_date(date('Y-m-d', strtotime('+14 day'))),
+        'sender' => 'Riya Sharma', 'payment_label' => '50% advance for Diwali campaign', 'amount' => inr(22500),
         'payment_due' => fmt_date(date('Y-m-d', strtotime('+3 day'))), 'paid_date' => fmt_date(today()), 'invoice_no' => 'SM-' . date('y') . '-0007', 'receipt_no' => 'SMR-00007', 'balance' => inr(22500)];
 }
 

@@ -99,7 +99,11 @@ page_start('Dashboard', 'dash');
 <section class="m-hero" aria-label="Today at a glance">
   <div class="mh-top">
     <div><small><?= h(date('l, j M')) ?></small><h1><?= h($greet) ?>, <?= h($first) ?></h1><p><?= h($summary) ?></p></div>
-    <div class="mh-ring" style="--p:<?= $todayPct ?>" role="img" aria-label="<?= $todayDone ?> of <?= $todayAll ?> reminders done today"><span><b><?= $todayDone ?>/<?= $todayAll ?></b><small>today</small></span></div>
+    <div class="mh-orb" role="img" aria-label="<?= $todayDone ?> of <?= $todayAll ?> reminders done today">
+      <div class="mh-ring" style="--p:<?= $todayPct ?>"></div>
+      <canvas class="mh-core" aria-hidden="true"></canvas>
+      <span class="mh-lab"><b><?= $todayDone ?>/<?= $todayAll ?></b><small>done today</small></span>
+    </div>
   </div>
   <div class="mh-stats">
     <a href="payments.php"><small>To collect</small><b><?= inr($k['pending']) ?></b></a>

@@ -42,7 +42,7 @@ function page_start(string $title, string $active, array $opt = []): void
 <body class="app pg-<?= h($active) ?>">
 <script type="application/json" id="sk-data"><?= json_encode(['csrf' => csrf(), 'user' => $u['name'] ?? ''], JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
 <aside class="side" aria-label="Main">
-  <a class="brand" href="index.php"><img src="../assets/img/logo.png" alt="<?= h($CFG['brand']) ?>" width="525" height="256"><span><?= h($CFG['app']) ?></span></a>
+  <a class="brand" href="index.php"><img src="assets/icons/icon-192.png" alt="" width="192" height="192"><span><b><?= h($CFG['app']) ?></b><small><?= h($CFG['brand']) ?></small></span></a>
   <button class="new-btn" type="button" data-open="dlg-client"><?= ic('plus') ?><span>New client</span></button>
   <nav class="side-nav">
     <?php foreach ($nav as [$href, $key, $label, $icon, $badge]): ?>
@@ -61,10 +61,11 @@ function page_start(string $title, string $active, array $opt = []): void
 
 <div class="main">
   <header class="top">
-    <a class="top-brand" href="index.php" aria-label="<?= h($CFG['brand']) ?> Client Hub home"><img src="assets/icons/icon-192.png" alt="" width="192" height="192"></a>
-    <span class="top-title"><?= h($active === 'dash' ? $CFG['app'] : $title) ?></span>
-    <?php if (test_mode()): ?><span class="test-chip" title="Short passwords are allowed while testing. Switch test_mode off in config.php before adding real client data.">Test mode</span><?php endif; ?>
-    <button class="search" type="button" data-open="palette" aria-label="Search clients and projects"><?= ic('search') ?><span>Search clients, projects, phone numbers</span><kbd>Ctrl K</kbd></button>
+    <div class="top-l">
+      <button class="search" type="button" data-open="palette" aria-label="Search clients and projects"><?= ic('search') ?><span>Search clients, projects, phone numbers</span><kbd>Ctrl K</kbd></button>
+      <?php if (test_mode()): ?><span class="test-chip" title="Short passwords are allowed while testing. Switch test_mode off in config.php before adding real client data.">Test mode</span><?php endif; ?>
+    </div>
+    <a class="top-logo" href="index.php" aria-label="<?= h($CFG['brand']) ?> Client Hub, dashboard"><img class="lg-ink" src="assets/icons/logo-ink.png" alt="" width="525" height="256"><img class="lg-white" src="../assets/img/logo.png" alt="" width="525" height="256"></a>
     <div class="top-r">
       <div class="quick">
         <button class="btn pri" type="button" data-menu="quick-menu"><?= ic('plus') ?><span>New</span><?= ic('down', 'i sm') ?></button>

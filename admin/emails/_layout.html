@@ -4,35 +4,42 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="x-apple-disable-message-reformatting">
-<meta name="color-scheme" content="light">
+<meta name="color-scheme" content="light only">
+<meta name="supported-color-schemes" content="light">
 <title>{{subject}}</title>
 </head>
 <body style="margin:0;padding:0;background:#eef2f4;-webkit-text-size-adjust:100%;">
-<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#eef2f4;">{{preheader}}&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;</div>
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#eef2f4;">{{preheader}}&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#eef2f4;">
-  <tr><td align="center" style="padding:24px 12px;">
+  <tr><td align="center" style="padding:28px 12px;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;">
-      <!-- header -->
-      <tr><td style="background:#0b0e18;border-radius:20px 20px 0 0;padding:26px 32px;" align="left">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-          <td><img src="{{logo_url}}" width="120" alt="{{brand}}" style="display:block;width:120px;max-width:120px;height:auto;border:0;color:#ffffff;font:bold 18px Arial,Helvetica,sans-serif;"></td>
-          <td align="right" style="font:600 12px/1.4 Arial,Helvetica,sans-serif;color:#8be7e8;">{{tag}}</td>
-        </tr></table>
+      <!-- header: logo in the middle, headline on the dark brand band -->
+      <tr><td align="center" bgcolor="#0b0e18" style="background:#0b0e18;background-image:radial-gradient(120% 90% at 100% 0%,#1d4d50 0%,rgba(11,14,24,0) 55%),linear-gradient(160deg,#141b2b,#0b0e18);border-radius:24px 24px 0 0;padding:34px 32px 30px;">
+        <img src="{{logo_url}}" width="132" alt="{{brand}}" style="display:block;margin:0 auto;width:132px;max-width:132px;height:auto;border:0;color:#ffffff;font:bold 20px Arial,Helvetica,sans-serif;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:22px auto 0;"><tr><td style="border:1px solid #2f6f71;border-radius:999px;padding:5px 14px;font:bold 12px Arial,Helvetica,sans-serif;color:#8be7e8;">{{tag}}</td></tr></table>
+        <p style="margin:14px 0 0;font:bold 28px/1.25 Arial,Helvetica,sans-serif;color:#ffffff;">{{headline}}</p>
+        <p style="margin:8px 0 0;font:15px/1.5 Arial,Helvetica,sans-serif;color:#9aa6b2;">{{subline}}</p>
       </td></tr>
-      <tr><td style="height:4px;line-height:4px;font-size:0;background:#48bec0;background-image:linear-gradient(90deg,#48bec0,#1f9a9c);">&nbsp;</td></tr>
+      <tr><td style="height:4px;line-height:4px;font-size:0;background:#48bec0;background-image:linear-gradient(90deg,#1f9a9c,#8be7e8,#1f9a9c);">&nbsp;</td></tr>
       <!-- body -->
-      <tr><td style="background:#ffffff;padding:34px 32px 30px;font:16px/1.6 Arial,Helvetica,sans-serif;color:#344054;">
-{{content}}
+      <tr><td style="background:#ffffff;padding:34px 32px 10px;font:16px/1.65 Arial,Helvetica,sans-serif;color:#344054;">
+@@CONTENT@@
+{{#note_box}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:4px 0 22px;"><tr><td style="padding:16px 18px;border-radius:16px;background:#fffaeb;border:1px solid #fedf89;font:15px/1.6 Arial,Helvetica,sans-serif;color:#344054;"><b style="display:block;margin-bottom:4px;font-size:13px;color:#b54708;">A note from {{sender}}</b>{{note_box}}</td></tr></table>{{/note_box}}
       </td></tr>
-      <!-- signature -->
-      <tr><td style="background:#ffffff;padding:0 32px 30px;font:15px/1.6 Arial,Helvetica,sans-serif;color:#344054;">
-        <p style="margin:0;">Warm regards,<br><b style="color:#101828;">Team {{brand}}</b><br><span style="color:#667085;font-size:14px;">{{brand_tagline}}</span></p>
+      <!-- signature and quick contact -->
+      <tr><td style="background:#ffffff;padding:4px 32px 30px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #e4e7ec;"><tr>
+          <td style="padding-top:20px;font:15px/1.6 Arial,Helvetica,sans-serif;color:#344054;">Warm regards,<br><b style="color:#101828;">{{sender}}</b><br><span style="color:#667085;font-size:13px;">Team {{brand}}</span></td>
+          <td align="right" valign="bottom" style="padding-top:20px;">
+            <a href="{{whatsapp_url}}" style="display:inline-block;margin-left:6px;padding:9px 14px;border-radius:999px;background:#e8f6f6;font:bold 13px Arial,Helvetica,sans-serif;color:#1f9a9c;text-decoration:none;">WhatsApp</a>
+            <a href="tel:{{brand_phone_tel}}" style="display:inline-block;margin-left:6px;padding:9px 14px;border-radius:999px;background:#e8f6f6;font:bold 13px Arial,Helvetica,sans-serif;color:#1f9a9c;text-decoration:none;">Call</a>
+          </td></tr></table>
       </td></tr>
       <!-- footer -->
-      <tr><td style="background:#f7f9fa;border-radius:0 0 20px 20px;padding:22px 32px;font:13px/1.6 Arial,Helvetica,sans-serif;color:#667085;border-top:1px solid #e4e7ec;">
-        <p style="margin:0 0 6px;"><a href="{{whatsapp_url}}" style="color:#1f9a9c;text-decoration:none;font-weight:bold;">WhatsApp</a> &nbsp;|&nbsp; <a href="tel:{{brand_phone_tel}}" style="color:#1f9a9c;text-decoration:none;font-weight:bold;">{{brand_phone}}</a> &nbsp;|&nbsp; <a href="mailto:{{brand_email}}" style="color:#1f9a9c;text-decoration:none;font-weight:bold;">{{brand_email}}</a></p>
-        <p style="margin:0;">{{brand}}, {{brand_city}} &nbsp;|&nbsp; <a href="{{site_url}}" style="color:#667085;">{{site_host}}</a></p>
-        <p style="margin:8px 0 0;font-size:12px;color:#98a2b3;">You are receiving this email because you are working with or enquired with {{brand}}. Reply to this email any time to reach our team.</p>
+      <tr><td align="center" style="background:#0b0e18;border-radius:0 0 24px 24px;padding:24px 32px;font:13px/1.6 Arial,Helvetica,sans-serif;color:#9aa6b2;">
+        <p style="margin:0 0 6px;font-weight:bold;color:#e8eef3;">{{brand_tagline}}</p>
+        <p style="margin:0 0 8px;"><a href="mailto:{{brand_email}}" style="color:#8be7e8;text-decoration:none;">{{brand_email}}</a> &nbsp;|&nbsp; <a href="tel:{{brand_phone_tel}}" style="color:#8be7e8;text-decoration:none;">{{brand_phone}}</a> &nbsp;|&nbsp; <a href="{{site_url}}" style="color:#8be7e8;text-decoration:none;">{{site_host}}</a></p>
+        <p style="margin:0;font-size:12px;color:#667085;">{{brand}}, {{brand_city}}. You are receiving this because you work with or enquired with {{brand}}. Reply any time to reach our team.</p>
       </td></tr>
     </table>
   </td></tr>

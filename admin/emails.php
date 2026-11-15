@@ -11,12 +11,17 @@ if ($slug !== '') {
     if (!isset($tpls[$slug])) { http_response_code(404); exit('Unknown email.'); }
     $cid = (int) ($_GET['client'] ?? 0);
     try {
-        $vars = $cid ? mail_vars($cid, (int) ($_GET['project'] ?? 0), (int) ($_GET['payment'] ?? 0)) + mail_sample_vars() : mail_sample_vars();
+        $vars = $cid ? ['note' => mb_substr((string) ($_GET['note'] ?? ''), 0, 1000), 'sender' => (string) ($me['name'] ?? '')] + mail_vars($cid, (int) ($_GET['project'] ?? 0), (int) ($_GET['payment'] ?? 0)) + mail_sample_vars() : mail_sample_vars();
+        $samples = ['meeting-confirmed' => 'Thursday, 11:00 am at our Andheri studio. Joining online? meet.google.com/abc-defg-hij',
+            'monthly-report' => 'Reach up 38%, 1,240 new followers and 3 reels above 50,000 views. Full report: drive.google.com/your-report'];
+        if (!$cid && isset($samples[$slug])) $vars['note'] = $samples[$slug];
         $vars['logo_url'] = '../assets/img/logo.png';   /* the preview shows the logo from this server */
         [$subject, $html] = mail_render($slug, $vars);
     } catch (Throwable $e) { http_response_code(404); exit('This preview could not be made.'); }
     /* the email loads its logo from the public website, so allow images from https for this page only */
     header("Content-Security-Policy: default-src 'none'; img-src https: data: 'self'; style-src 'unsafe-inline'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'", true);
+    header('X-Frame-Options: SAMEORIGIN', true);
+    header('Cross-Origin-Resource-Policy: same-origin', true);
     header('Content-Type: text/html; charset=utf-8');
     echo str_replace('<title>', '<title>Preview: ', $html);
     exit;
@@ -25,8 +30,6 @@ if ($slug !== '') {
 require __DIR__ . '/_layout.php';
 $c = mail_cfg();
 $autoFor = ['enquiry-received' => 'enquiry_received', 'payment-received' => 'payment_received', 'project-delivered' => 'project_delivered', 'project-confirmed' => 'project_confirmed', 'welcome' => 'welcome'];
-$when = ['enquiry_received' => 'when a website enquiry arrives', 'payment_received' => 'when a payment is marked as paid', 'project_delivered' => 'when a project is marked Delivered',
-    'project_confirmed' => 'when a new project is created', 'welcome' => 'when a lead becomes an active client'];
 page_start('Client emails', 'emails');
 ?>
 <section class="page-h">
@@ -43,11 +46,12 @@ page_start('Client emails', 'emails');
 <ul class="mail-grid">
   <?php foreach ($tpls as $s => $t): $a = $autoFor[$s] ?? ''; $auto = $a && !empty($c['auto'][$a]); ?>
   <li class="mcard">
-    <div class="mc-top"><span class="mc-i"><?= ic(str_starts_with($s, 'payment') ? 'wallet' : (str_starts_with($s, 'project') ? 'layers' : ($s === 'welcome' ? 'star' : 'spark'))) ?></span>
+    <a class="mc-thumb" href="emails.php?preview=<?= h($s) ?>" target="_blank" rel="noopener" aria-label="Open the <?= h($t['title']) ?> preview"><iframe src="emails.php?preview=<?= h($s) ?>" loading="lazy" tabindex="-1" title="" aria-hidden="true"></iframe></a>
+    <div class="mc-top"><span class="mc-i"><?= ic(['payment-request' => 'wallet', 'payment-reminder' => 'wallet', 'payment-received' => 'check', 'renewal-reminder' => 'wallet', 'proposal-sent' => 'note', 'meeting-confirmed' => 'cal', 'monthly-report' => 'trend', 'feedback-request' => 'star', 'welcome' => 'star', 'project-confirmed' => 'layers', 'project-delivered' => 'layers'][$s] ?? 'spark') ?></span>
       <?= $auto ? chip('Automatic', 'ok') : chip('Send from profile', 'mute') ?></div>
     <h2><?= h($t['title']) ?></h2>
     <p class="mc-sub"><?= h(mail_fill($t['subject'], mail_brand_vars() + mail_sample_vars(), false)) ?></p>
-    <p class="mc-about"><?= h($t['about']) ?><?= $auto ? ' Goes out ' . h($when[$a]) . '.' : '' ?></p>
+    <p class="mc-about"><?= h($t['about']) ?></p>
     <a class="btn ghost sm" href="emails.php?preview=<?= h($s) ?>" target="_blank" rel="noopener"><?= ic('eye') ?>Preview</a>
   </li>
   <?php endforeach; ?>

@@ -109,19 +109,27 @@ Share, then "Add to Home Screen" (iPhone). It opens full screen with its own ico
 caches only styles, scripts and icons, never pages or client data. The same manifest can be wrapped
 as an Android app later (for example with Bubblewrap or PWABuilder).
 
-**Client emails.** Seven branded emails live in `admin/emails/` (plain HTML with inline styles, safe for
-Gmail, Outlook and phones):
+**Client emails.** Twelve branded emails live in `admin/emails/` (tables and inline styles, safe for
+Gmail, Outlook, Apple Mail and phones). They share one design: the logo centred on a dark brand band,
+a headline, a highlighted amount where it matters, and a footer with WhatsApp and call buttons.
+`tools/gen_emails.py` regenerates them all from one file if you want to change the design or wording.
 
 | Template | When it is used |
 |---|---|
 | `enquiry-received` | Thank you to a website enquiry (automatic) |
 | `welcome` | Welcome a new client (optional automatic when a lead becomes Active) |
+| `proposal-sent` | Proposal or quotation with scope, dates and investment |
 | `project-confirmed` | Project confirmation with service, dates and value |
+| `meeting-confirmed` | Meeting or call confirmation (details go in the personal note) |
 | `payment-request` | Ask for an invoice, advance or retainer, with payment details |
 | `payment-reminder` | Polite reminder for a due or overdue payment |
 | `payment-received` | Receipt when a payment is marked as paid (automatic) |
+| `renewal-reminder` | Monthly retainer renewal notice |
+| `monthly-report` | Monthly results (highlights or report link in the personal note) |
 | `project-delivered` | Delivery note with a review request (optional automatic) |
+| `feedback-request` | Ask a happy client for a review or feedback |
 
+Every email can carry an optional personal note from the team member who sends it.
 The team sends any of them from a client's profile ("Send email", or the send icon on a project or
 payment). The **Client emails** page previews every template. Sending is off until the `mail` block in
 `admin/config.php` is filled in: copy it from `config.sample.php`, set `enabled` to `true` and add the

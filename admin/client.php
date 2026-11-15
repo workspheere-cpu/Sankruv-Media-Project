@@ -274,6 +274,7 @@ page_start($c['name'], 'clients');
       <label class="fld">Project<select name="project_id" id="em-proj"><option value="">No project</option><?php foreach ($projects as $p): ?><option value="<?= (int) $p['id'] ?>"><?= h($p['title']) ?></option><?php endforeach; ?></select></label>
       <label class="fld">Payment<select name="payment_id" id="em-pay"><option value="">No payment</option><?php foreach ($pays as $p): ?><option value="<?= (int) $p['id'] ?>"><?= h($p['label'] . ', ' . inr($p['amount']) . ($p['status'] === 'paid' ? ', paid' : '')) ?></option><?php endforeach; ?></select></label>
     </div>
+    <label class="fld">Personal note (optional)<textarea name="note" id="em-note" rows="3" maxlength="1000" placeholder="Shown in its own box. For a meeting, write the date, time and place or link here."></textarea></label>
     <p class="em-about" id="em-about"></p>
     <?php if (!mail_enabled()): ?><p class="em-off"><?= ic('lock') ?><span>Email sending is not switched on yet. You can preview every email now. Your developer turns sending on in <b>config.php</b>.</span></p><?php endif; ?>
     <p class="dlg-err" role="alert"></p>
