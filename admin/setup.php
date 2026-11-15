@@ -19,6 +19,11 @@ preg_match('/[0-9A-F]{6}-[0-9A-F]{6}/', (string) @file_get_contents($codeFile), 
 $expected = $m[0] ?? '';
 $where = sk_data_inside_web() ? 'public_html' . str_replace(str_replace('\\', '/', rtrim((string) ($_SERVER['DOCUMENT_ROOT'] ?? ''), '/')), '', str_replace('\\', '/', sk_data_dir())) : 'the folder sankruv-client-hub-data, next to public_html';
 
+/* A private one-time link (setup.php?key=...) can stand in for the code file. The key lives only in the
+   server's config.php, never in the public repository, and stops working once the owner account exists. */
+$linkKey = (string) ($CFG['setup_key'] ?? '');
+$viaLink = strlen($linkKey) >= 24 && hash_equals($linkKey, (string) ($_GET['key'] ?? ''));
+
 $err = '';
 $val = fn($k) => h($_POST[$k] ?? '');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -27,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = strtolower(trim((string) ($_POST['username'] ?? '')));
     $email = trim((string) ($_POST['email'] ?? ''));
     $pass = (string) ($_POST['password'] ?? '');
-    $code = strtoupper(trim((string) ($_POST['code'] ?? '')));
+    $code = $viaLink ? $expected : strtoupper(trim((string) ($_POST['code'] ?? '')));
     if (!rate_ok('setup', 10, 900)) $err = 'Too many attempts. Please wait 15 minutes and try again.';
     elseif ($expected === '' || !hash_equals($expected, $code)) $err = 'That setup code does not match. Copy it again from setup-code.txt.';
     elseif ($name === '' || mb_strlen($name) > 80) $err = 'Enter your name.';
@@ -61,11 +66,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="ch"><span class="lg"><img src="../assets/img/logo.png" alt="Sankruv Media" width="525" height="256"></span><span class="st"><i></i><span>First-time setup</span></span></div>
       <h2>Create the owner account</h2>
       <p class="sub">This page works once. The owner can add team members later.</p>
+      <?php if ($viaLink): ?>
+      <div class="howto"><?= ic('shield') ?><p>This private setup link is verified. Choose your own User ID and password. Only you will know the password.</p></div>
+      <?php else: ?>
       <div class="howto"><?= ic('lock') ?><p>For safety, open <b>setup-code.txt</b> with Hostinger's File Manager in <b><?= h($where) ?></b>, and copy the code below. The file is deleted when setup is finished.</p></div>
+      <?php endif; ?>
       <?php if ($err): ?><p class="err" role="alert"><?= ic('x') ?><span><?= h($err) ?></span></p><?php endif; ?>
       <?= csrf_field() ?>
+      <?php if (!$viaLink): ?>
       <label for="code">Setup code</label>
       <div class="in"><?= ic('shield') ?><input id="code" name="code" required placeholder="XXXXXX-XXXXXX" value="<?= $val('code') ?>" autocomplete="off" spellcheck="false" autocapitalize="characters"></div>
+      <?php endif; ?>
       <div class="two">
         <div><label for="n">Your name</label><div class="in"><?= ic('user') ?><input id="n" name="name" required value="<?= $val('name') ?>" autocomplete="name"></div></div>
         <div><label for="u">User ID</label><div class="in"><?= ic('tag') ?><input id="u" name="username" required value="<?= $val('username') ?>" autocomplete="username" spellcheck="false" autocapitalize="off" placeholder="for example: owner"></div></div>

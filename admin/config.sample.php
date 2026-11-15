@@ -12,4 +12,7 @@ return [
     'data_dir' => '',
     // Where the "View website" link in the sidebar points.
     'site_url' => '../index.html',
+    // Optional private first-run link: setup.php?key=THIS_VALUE (at least 24 characters).
+    // It works only until the owner account exists. Never put a real key in a public repository.
+    'setup_key' => '',
 ];

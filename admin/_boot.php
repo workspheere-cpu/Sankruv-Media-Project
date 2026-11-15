@@ -11,7 +11,7 @@ declare(strict_types=1);
 if (realpath((string) ($_SERVER['SCRIPT_FILENAME'] ?? '')) === __FILE__) { http_response_code(404); exit; }
 define('SK', 1);
 
-$CFG = ['brand' => 'Sankruv Media', 'app' => 'Client Hub', 'tz' => 'Asia/Kolkata', 'data_dir' => '', 'site_url' => '../index.html'];
+$CFG = ['brand' => 'Sankruv Media', 'app' => 'Client Hub', 'tz' => 'Asia/Kolkata', 'data_dir' => '', 'site_url' => '../index.html', 'setup_key' => ''];
 if (is_file(__DIR__ . '/config.php')) { $CFG = array_merge($CFG, (array) require __DIR__ . '/config.php'); }
 date_default_timezone_set($CFG['tz']);
 
