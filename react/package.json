@@ -1,0 +1,18 @@
+{
+  "name": "sankruv-media-site",
+  "private": true,
+  "version": "2.0.0",
+  "description": "Sankruv Media website: React, rendered to static HTML at build time and hydrated in the browser.",
+  "scripts": {
+    "build": "node build.cjs",
+    "build:preview": "node build.cjs --noindex",
+    "serve": "npx serve dist"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

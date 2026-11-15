@@ -4,3 +4,6 @@ admin/config.php
 admin/data/
 *.sqlite
 *.sqlite-*
+react/dist/
+react/.cache/
+node_modules/
