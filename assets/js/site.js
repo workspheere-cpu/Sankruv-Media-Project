@@ -264,7 +264,8 @@
         services: $$('input[name="services"]:checked', form).map(function (x) { return x.value; }),
         timeline: ($('input[name="timeline"]:checked', form) || {}).value || '',
         name: $('#f-name').value.trim(), phone: $('#f-phone').value.trim(), email: $('#f-email').value.trim(),
-        company: $('#f-company').value.trim(), message: $('#f-msg').value.trim()
+        company: $('#f-company').value.trim(), message: $('#f-msg').value.trim(),
+        website: ($('#f-web') || {}).value || ''
       };
       var text = 'Hello Sankruv Media, I would like a free quote.\n\nServices: ' + data.services.join(', ') + '\nTimeline: ' + data.timeline +
         '\nName: ' + data.name + (data.company ? '\nCompany: ' + data.company : '') + '\nEmail: ' + data.email + (data.phone ? '\nPhone: ' + data.phone : '') +
@@ -296,7 +297,7 @@
     addEventListener('pointermove', function (e) {
       cx = e.clientX; cy = e.clientY; mx = cx / innerWidth - 0.5; my = cy / innerHeight - 0.5;
       html.style.setProperty('--px', mx.toFixed(3)); html.style.setProperty('--py', my.toFixed(3));
-      if (ring2) ring2.classList.add('on');
+      if (ring2) ring2.classList.toggle('on', e.pointerType === 'mouse');
     }, { passive: true });
     d.addEventListener('pointerover', function (e) { if (ring2) ring2.classList.toggle('big', !!e.target.closest('a,button,label.opt,summary,.ringwrap')); });
     d.documentElement.addEventListener('mouseleave', function () { if (ring2) ring2.classList.remove('on'); });
@@ -312,6 +313,36 @@
       });
       c.addEventListener('pointerleave', function () { c.style.setProperty('--ry', '0deg'); c.style.setProperty('--rx', '0deg'); });
     });
+  }
+
+  /* ---------- touch feedback: ripple on what you press, a soft glow anywhere else ---------- */
+  var RIP = '.btn,.tabbar a,.mn-quote,.mn-main a,.mn-svc a,.mn-acts a,.mn-topics a,.mn-post,.prow,.opt,.ch,.chips li,.pick a,.svc-rows a,.jump a,.pfilter button,.bfilter button,.faq-list summary,.chap-rail button,.rc,.hcall,#burger,.share a,.share button,.feat';
+  if (!reduce) d.addEventListener('pointerdown', function (e) {
+    if (e.pointerType === 'mouse') return;
+    var host = e.target.closest && e.target.closest(RIP);
+    if (host) {
+      if (host.classList.contains('fab')) host = $('.fab-b', host) || host;
+      host.classList.add('rip-host');
+      var r = host.getBoundingClientRect(), sz = Math.max(r.width, r.height) * 2.2, sp = d.createElement('span');
+      sp.className = 'rip';
+      sp.style.cssText = 'width:' + sz + 'px;height:' + sz + 'px;left:' + (e.clientX - r.left - sz / 2) + 'px;top:' + (e.clientY - r.top - sz / 2) + 'px';
+      host.appendChild(sp); setTimeout(function () { sp.remove(); }, 650);
+      if (navigator.vibrate && host.closest('.tabbar,.mnav')) { try { navigator.vibrate(6); } catch (x) {} }
+    } else {
+      var dot = d.createElement('span'); dot.className = 'tap-dot';
+      dot.style.left = e.clientX + 'px'; dot.style.top = e.clientY + 'px';
+      d.body.appendChild(dot); setTimeout(function () { dot.remove(); }, 600);
+    }
+  }, { passive: true });
+  if (io && narrow.matches && !reduce) {
+    var nio = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        var el = e.target; if (!e.isIntersecting) return; nio.unobserve(el);
+        if (el.scrollWidth - el.clientWidth < 30) return;
+        setTimeout(function () { el.scrollTo({ left: 48, behavior: 'smooth' }); setTimeout(function () { el.scrollTo({ left: 0, behavior: 'smooth' }); }, 520); }, 350);
+      });
+    }, { threshold: 0.9 });
+    $$('.chips,.reasons,.jump,.pfilter,.bfilter').forEach(function (el) { nio.observe(el); });
   }
 
   /* ---------- scroll and resize loop ---------- */

@@ -76,10 +76,35 @@ motion get still frames.
 
 ## Contact form
 
-The three-step brief works without a server: it validates the answers and opens WhatsApp or the
-visitor's email app with the brief already written. When a backend is ready, put its URL in the
-form's `data-endpoint` attribute in `src/pages/contact.html`; the brief is then sent there as JSON
-(`services`, `timeline`, `name`, `phone`, `email`, `company`, `message`).
+The three-step brief posts to `admin/lead.php` (set in `data-endpoint` in `src/pages/contact.html`).
+Each enquiry becomes a **new lead** in the Client Hub, with the full brief in its history and a
+high-priority reminder to reply the next day. The visitor still gets the WhatsApp and email buttons,
+so nothing is lost if the server is down. A hidden `website` field catches spam bots.
+
+## Client Hub (admin)
+
+A private team workspace at `/admin/` (PHP 8 + SQLite, no database server needed).
+
+| Page | What it does |
+|---|---|
+| `index.php` | Dashboard: today's reminders, deadlines, pipeline, new leads, payments due, recent activity |
+| `clients.php` | Every client as a card, with status filters, sort, quick filter and CSV export |
+| `client.php` | The client profile: details edited in place, services, notes, projects, reminders, payments, history |
+| `projects.php` | Board by stage. Drag a card to change its stage |
+| `reminders.php` | Overdue, today, tomorrow, this week, later and completed |
+| `payments.php` | To collect, overdue and received, with monthly and yearly totals |
+| `team.php` | Owners add or disable team accounts; everyone can change their own password |
+
+**First run.** Open `/admin/`. It goes to a one-time setup page that asks for a code. The server
+writes that code to `setup-code.txt` in the hub's data folder: `sankruv-client-hub-data` next to
+`public_html` when the host allows it, otherwise `admin/data/`. Open the file with the hosting file
+manager, copy the code, and create the owner account. The file is deleted afterwards.
+
+**Data and safety.** The database, sessions and setup code live in the data folder, which is never
+committed (see `.gitignore`) and is blocked from the web. Sign-in uses hashed passwords, CSRF tokens,
+rate limits and a 10-minute lock after 5 wrong passwords. Sessions end after 8 idle hours. Pages send
+a strict Content Security Policy and `noindex`. Optional settings go in `admin/config.php`
+(copy `admin/config.sample.php`). Back up the data folder regularly.
 
 ## Before going live
 

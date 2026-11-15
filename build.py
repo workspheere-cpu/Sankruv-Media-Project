@@ -293,21 +293,37 @@ def header(active, root):
     dd = ''.join(f'<a href="{root}{s["file"]}">{icon(s["key"])}<span><b>{esc(s["name"])}</b><span>{esc(s["summary"].split(",")[0])}</span></span></a>' for s in SERVICES)
     left = f'<div class="dd">{a(*NAV_L[0])}<div class="dd-panel">{dd}</div></div>' + ''.join(a(*x) for x in NAV_L[1:])
     right = ''.join(a(*x) for x in NAV_R)
-    mob = ''.join(f'<a href="{root}{f}" style="--i:{i}">{t}</a>' for i, (k, f, t) in enumerate([('home', 'index.html', 'Home')] + NAV_L + NAV_R))
-    mob_s = ''.join(f'<a href="{root}{s["file"]}">{esc(s["name"])}</a>' for s in SERVICES)
+    MN = [('home', 'index.html', 'Home', 'Start here', 'home'), ('services', 'services.html', 'Services', 'Social, websites, branding, shoots', 'grid'),
+          ('work', 'projects.html', 'Work', 'Projects and campaigns', 'layers'), ('about', 'about.html', 'About', 'Who we are and how we work', 'experience'),
+          ('blog', 'blog.html', 'Blog', 'Guides on marketing, video and branding', 'doc'), ('contact', 'contact.html', 'Contact', 'Talk to our team', 'send')]
+    mob = ''.join(f'<a href="{root}{f}" style="--i:{i}"{" class=\"on\" aria-current=\"page\"" if k == active else ""}><span class="mn-i">{icon(ic)}</span>'
+                  f'<span class="mn-t"><b>{t}</b><small>{d}</small></span>{ARROW}</a>' for i, (k, f, t, d, ic) in enumerate(MN))
+    mob_s = ''.join(f'<a href="{root}{s["file"]}" style="--i:{i + 6}"><span class="mn-si">{icon(s["key"])}</span><b>{esc(s["short"])}</b><small>{esc(s["name"])}</small></a>' for i, s in enumerate(SERVICES))
+    topics = ''.join(f'<a href="{root}blog.html?cat={slugify(c)}">{esc(c)}</a>' for c in BLOG.get('cats', []))
+    lp = BLOG.get('latest')
+    latest = (f'<a class="mn-post" href="{root}blog/{lp["slug"]}.html"><span class="mn-pt">{cover(lp)}</span><span><small>Latest article</small><b>{esc(lp["title"])}</b></span></a>') if lp else ''
     return f'''<header id="hdr">
   <div class="hdr">
     <a class="hcall" href="tel:{SITE["phone_e164"]}" aria-label="Call Sankruv Media">{icon("phone")}</a>
     <nav class="hl" aria-label="Main">{left}</nav>
-    <a class="logo" href="{root}index.html" aria-label="Sankruv Media home"><img src="{root}assets/img/logo.png" alt="Sankruv Media" width="327" height="156"></a>
+    <a class="logo" href="{root}index.html" aria-label="Sankruv Media home"><img src="{root}assets/img/logo.png" alt="Sankruv Media" width="525" height="256"></a>
     <div class="hr"><nav class="hr-links" aria-label="More">{right}</nav>{btn(root + "contact.html", "Free quote", "hot sm")}
       <button id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="mnav"><i></i><i></i></button></div>
   </div>
 </header>
 <div class="mnav" id="mnav" hidden>
-  <nav class="mn-main" aria-label="Mobile">{mob}</nav>
-  <div class="mn-svc"><p>Services</p>{mob_s}</div>
-  <div class="mn-cta">{btn(SITE["whatsapp_link"], "WhatsApp us", "hot", WA_EXTRA)}{btn("tel:" + SITE["phone_e164"], SITE["phone"], "ghost")}</div>
+  <div class="mn-in">
+    <a class="mn-quote" href="{root}contact.html" style="--i:0"><span><b>Get a free quote</b><small>Tell us what you need in under a minute</small></span>{ARROW}</a>
+    <nav class="mn-main" aria-label="Site sections">{mob}</nav>
+    <section class="mn-sec" aria-label="Services"><p class="mn-h">Our services</p><div class="mn-svc">{mob_s}</div></section>
+    <section class="mn-sec" aria-label="Blog topics"><p class="mn-h">Read by topic</p><div class="mn-topics">{topics}</div>{latest}</section>
+    <div class="mn-acts">
+      <a href="{SITE["whatsapp_link"]}"{WA_EXTRA}>{icon("wa")}<span>WhatsApp</span></a>
+      <a href="tel:{SITE["phone_e164"]}">{icon("phone")}<span>Call</span></a>
+      <a href="mailto:{SITE["email"]}">{icon("mail")}<span>Email</span></a>
+      <a href="{SITE["instagram"]}"{WA_EXTRA}>{icon("ig")}<span>Instagram</span></a>
+    </div>
+  </div>
 </div>'''
 
 def tabbar(active, root):
@@ -363,6 +379,7 @@ def render(path, main, *, title, description, nav='', jsonld=(), og_type='websit
     SITEMAP.append((url, path))
 
 SITEMAP = []
+BLOG = {}
 
 # ------------------------------------------------------------------ page sources
 def page_source(name):
@@ -388,12 +405,14 @@ def main():
     if OUT != ROOT:
         shutil.rmtree(OUT, ignore_errors=True); OUT.mkdir(parents=True)
         shutil.copytree(ROOT / 'assets', OUT / 'assets')
+        shutil.copytree(ROOT / 'admin', OUT / 'admin', ignore=shutil.ignore_patterns('data', 'config.php', '*.sqlite*', 'setup-code.txt'))
 
     posts = sorted((parse_post(p) for p in (ROOT / 'content/blog').glob('*.md') if not p.name.startswith('_')),
                    key=lambda p: (p['date'], p['order']), reverse=True)
     cats = []
     for p in posts:
         if p['category'] not in cats: cats.append(p['category'])
+    BLOG['cats'] = cats; BLOG['latest'] = posts[0] if posts else None
 
     latest = lambda: '<ul class="prows">' + ''.join(post_row(p, '') for p in posts[:3]) + '</ul>'
     def featured():
@@ -504,7 +523,7 @@ def main():
     urls = ''.join(f'  <url><loc>{u}</loc><lastmod>{post_dates.get(path, TODAY).isoformat()}</lastmod></url>\n' for u, path in SITEMAP if path != '404.html')
     (OUT / 'sitemap.xml').write_text(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}</urlset>\n', encoding='utf-8')
     (OUT / 'robots.txt').write_text(('User-agent: *\nDisallow: /\n' if NOINDEX else
-                                     f'User-agent: *\nAllow: /\nDisallow: /src/\nDisallow: /content/\n\nSitemap: {BASE}sitemap.xml\n'), encoding='utf-8')
+                                     f'User-agent: *\nAllow: /\nDisallow: /src/\nDisallow: /content/\nDisallow: /admin/\n\nSitemap: {BASE}sitemap.xml\n'), encoding='utf-8')
     print(f'Built {len(SITEMAP)} pages ({len(posts)} articles) into {OUT}')
 
 def _q(s):

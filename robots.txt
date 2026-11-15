@@ -2,5 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /src/
 Disallow: /content/
+Disallow: /admin/
 
 Sitemap: https://www.sankruvmedia.com/sitemap.xml

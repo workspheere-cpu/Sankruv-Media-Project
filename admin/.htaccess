@@ -1,0 +1,15 @@
+# Client Hub: private area. Keep it out of search engines and block internal files.
+Options -Indexes
+DirectoryIndex index.php
+<IfModule mod_headers.c>
+  Header set X-Robots-Tag "noindex, nofollow"
+</IfModule>
+<FilesMatch "^(_.*\.php|config\.php|config\.sample\.php|.*\.sqlite.*|setup-code\.txt)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order deny,allow
+    Deny from all
+  </IfModule>
+</FilesMatch>
