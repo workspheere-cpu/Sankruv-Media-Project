@@ -62,24 +62,40 @@ $todo = $k['rem_over'] + $k['rem_today'];
 $todayDone = (int) col('SELECT COUNT(*) FROM reminders WHERE done = 1 AND substr(due_at, 1, 10) = ?', [$t]);
 $todayAll = $todayDone + $todo;
 $todayPct = $todayAll ? (int) round($todayDone / $todayAll * 100) : 100;
+
+/* needs attention: each item links straight to the fix */
+$overPayN = (int) col("SELECT COUNT(*) FROM payments WHERE status = 'pending' AND due_date != '' AND due_date < ?", [$t]);
+$staleLeads = (int) col("SELECT COUNT(*) FROM clients WHERE status = 'lead' AND created_at < ?", [date('Y-m-d H:i:s', strtotime('-2 day'))]);
+$attention = array_values(array_filter([
+    $overPayN ? ['payments.php?f=overdue', 'wallet', 'bad', $overPayN . ' overdue payment' . ($overPayN > 1 ? 's' : ''), inr($k['overdue_pay']) . ' to chase'] : null,
+    $k['late'] ? ['projects.php', 'flag', 'bad', $k['late'] . ' project' . ($k['late'] > 1 ? 's' : '') . ' past deadline', 'Update the dates or the status'] : null,
+    $k['rem_over'] ? ['reminders.php', 'bell', 'warn', $k['rem_over'] . ' overdue reminder' . ($k['rem_over'] > 1 ? 's' : ''), 'Tick them off or move them'] : null,
+    $staleLeads ? ['clients.php?status=lead', 'spark', 'lead', $staleLeads . ' lead' . ($staleLeads > 1 ? 's' : '') . ' waiting over 2 days', 'Call or WhatsApp them today'] : null,
+]));
+
+/* getting started checklist, shown until every step is done */
+$steps = [
+    ['Add your first client', $clientsTotal > 0, 'dlg-client'],
+    ['Create a project with a deadline', (int) col("SELECT COUNT(*) FROM projects WHERE due_date != ''") > 0, 'dlg-project'],
+    ['Set a reminder', (int) col('SELECT COUNT(*) FROM reminders') > 0, 'dlg-reminder'],
+    ['Record a payment', (int) col('SELECT COUNT(*) FROM payments') > 0, 'dlg-payment'],
+    ['Give your team their own sign-in', (int) col('SELECT COUNT(*) FROM users') > 1, 'team.php'],
+    ['Switch on client emails', mail_enabled(), 'emails.php'],
+];
+$stepsDone = count(array_filter($steps, fn($x) => $x[1]));
+
+/* lead conversion over the last 90 days */
+$since90 = date('Y-m-d', strtotime('-90 day'));
+$new90 = (int) col('SELECT COUNT(*) FROM clients WHERE created_at >= ?', [$since90]);
+$won90 = (int) col("SELECT COUNT(*) FROM clients WHERE created_at >= ? AND status IN ('active','completed','on_hold')", [$since90]);
+$conv = $new90 ? (int) round($won90 / $new90 * 100) : 0;
+$web90 = (int) col("SELECT COUNT(*) FROM clients WHERE created_at >= ? AND source = 'Website form'", [$since90]);
 $summary = $clientsTotal === 0 ? 'Add your first client to start tracking projects, deadlines and payments.'
     : ($todo ? $todo . ' reminder' . ($todo > 1 ? 's' : '') . ' need' . ($todo > 1 ? '' : 's') . ' attention today' : 'No reminders due today')
       . ($k['due7'] ? ', and ' . $k['due7'] . ' project deadline' . ($k['due7'] > 1 ? 's are' : ' is') . ' coming up this week.' : '.');
 
 page_start('Dashboard', 'dash');
 ?>
-<section class="hello">
-  <div>
-    <p class="eyebrow"><?= h(date('l, j F Y')) ?></p>
-    <h1><?= h($greet) ?>, <?= h($first) ?></h1>
-    <p class="lead"><?= h($summary) ?></p>
-  </div>
-  <div class="hello-act">
-    <button class="btn ghost" type="button" data-open="dlg-reminder"><?= ic('bell') ?>Add reminder</button>
-    <button class="btn pri" type="button" data-open="dlg-project"><?= ic('layers') ?>New project</button>
-  </div>
-</section>
-
 <section class="m-hero" aria-label="Today at a glance">
   <div class="mh-top">
     <div><small><?= h(date('l, j M')) ?></small><h1><?= h($greet) ?>, <?= h($first) ?></h1><p><?= h($summary) ?></p></div>
@@ -98,12 +114,29 @@ page_start('Dashboard', 'dash');
   </nav>
 </section>
 
-<nav class="qa-row" aria-label="Quick add">
-  <button type="button" data-open="dlg-client"><span><?= ic('user') ?></span>Client</button>
-  <button type="button" data-open="dlg-reminder"><span><?= ic('bell') ?></span>Reminder</button>
-  <button type="button" data-open="dlg-project"><span><?= ic('layers') ?></span>Project</button>
-  <button type="button" data-open="dlg-payment"><span><?= ic('wallet') ?></span>Payment</button>
+<?php if ($attention): ?>
+<nav class="attn" aria-label="Needs attention">
+  <span class="attn-h"><?= ic('flag') ?>Needs attention</span>
+  <?php foreach ($attention as [$href, $icon, $tone, $title, $sub]): ?>
+  <a class="attn-i t-<?= $tone ?>" href="<?= $href ?>"><span class="ai-i"><?= ic($icon) ?></span><span><b><?= h($title) ?></b><small><?= h($sub) ?></small></span><?= ic('chev', 'i sm') ?></a>
+  <?php endforeach; ?>
 </nav>
+<?php else: ?>
+<p class="attn ok"><span class="attn-h"><?= ic('check') ?>All clear</span><span class="muted">No overdue payments, late projects or waiting leads.</span></p>
+<?php endif; ?>
+
+<?php if ($stepsDone < count($steps)): ?>
+<section class="setup-card" id="setup-card" aria-label="Getting started">
+  <div class="sc-h"><div><h2>Set up your Client Hub</h2><p><?= $stepsDone ?> of <?= count($steps) ?> done. Finish these to get the most out of it.</p></div>
+    <span class="sc-ring" style="--p:<?= (int) round($stepsDone / count($steps) * 100) ?>"><b><?= (int) round($stepsDone / count($steps) * 100) ?>%</b></span>
+    <button class="icon-btn" type="button" data-hide="setup-card" aria-label="Hide for now"><?= ic('x') ?></button></div>
+  <ol class="sc-steps">
+    <?php foreach ($steps as [$label, $done, $go]): ?>
+    <li class="<?= $done ? 'done' : '' ?>"><?php if ($done): ?><span class="sc-c"><?= ic('check', 'i sm') ?></span><?= h($label) ?><?php elseif (str_ends_with($go, '.php')): ?><a href="<?= h($go) ?>"><span class="sc-c"></span><?= h($label) ?></a><?php else: ?><button type="button" data-open="<?= h($go) ?>"><span class="sc-c"></span><?= h($label) ?></button><?php endif; ?></li>
+    <?php endforeach; ?>
+  </ol>
+</section>
+<?php endif; ?>
 
 <section class="kpis" aria-label="Summary">
   <a class="kpi" href="clients.php?status=active"><span class="k-i"><?= ic('users') ?></span><b data-count="<?= $k['active'] ?>"><?= $k['active'] ?></b><span>Active clients</span></a>
@@ -118,6 +151,7 @@ page_start('Dashboard', 'dash');
   <?php foreach ($week as $i => $w): $n = $w['rem'] + $w['dl']; ?>
   <a class="wd<?= $i === 0 ? ' now' : '' ?><?= $n ? ' busy' : '' ?>" href="reminders.php" title="<?= h(fmt_date($w['d'])) ?>: <?= $w['rem'] ?> reminders, <?= $w['dl'] ?> deadlines">
     <small><?= $i === 0 ? 'Today' : h(date('D', strtotime($w['d']))) ?></small><b><?= h(date('j', strtotime($w['d']))) ?></b>
+    <span class="wd-t"><?= $n ? ($w['rem'] ? $w['rem'] . ' task' . ($w['rem'] > 1 ? 's' : '') : '') . ($w['rem'] && $w['dl'] ? ', ' : '') . ($w['dl'] ? $w['dl'] . ' due' : '') : 'Free' ?></span>
     <span class="wd-dots"><?php for ($j = 0; $j < min(3, $w['rem']); $j++): ?><i class="r"></i><?php endfor; ?><?php for ($j = 0; $j < min(2, $w['dl']); $j++): ?><i class="d"></i><?php endfor; ?></span>
   </a>
   <?php endforeach; ?>
@@ -199,6 +233,7 @@ page_start('Dashboard', 'dash');
 
   <section class="panel leads">
     <header class="ph"><h2><?= ic('spark') ?>New leads</h2><a class="more" href="clients.php?status=lead">All leads<?= ic('chev') ?></a></header>
+    <div class="conv" title="Last 90 days"><div><b><?= $new90 ?></b><small>New, 90 days</small></div><div><b><?= $conv ?>%</b><small>Became clients</small></div><div><b><?= $web90 ?></b><small>From website</small></div></div>
     <?php if (!$leads): ?>
       <div class="empty"><span class="e-i"><?= ic('spark') ?></span><p><b>No open leads.</b> Enquiries from the website contact form arrive here automatically.</p></div>
     <?php else: ?>

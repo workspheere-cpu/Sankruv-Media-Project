@@ -442,6 +442,13 @@
     $$('.dash .dt').forEach(p => p.classList.toggle('dt-on', p.classList.contains(b.dataset.dt)));
   }));
 
+  /* ---------- hide a card for this browser (getting started) ---------- */
+  $$('[data-hide]').forEach(b => {
+    const id = b.dataset.hide, el = document.getElementById(id);
+    try { if (el && localStorage.getItem('sk-hide-' + id)) el.hidden = true; } catch (x) {}
+    b.addEventListener('click', () => { if (el) el.hidden = true; try { localStorage.setItem('sk-hide-' + id, '1'); } catch (x) {} });
+  });
+
   /* ---------- installable app: register the service worker ---------- */
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
     window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
