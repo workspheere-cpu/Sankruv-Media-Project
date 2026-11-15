@@ -37,7 +37,7 @@ function page_start(string $title, string $active, array $opt = []): void
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&amp;family=Anton&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/admin.css?v=<?= h((string) @filemtime(__DIR__ . '/assets/admin.css')) ?>">
+<link rel="stylesheet" href="assets/hub.css?v=<?= h((string) @filemtime(__DIR__ . '/assets/hub.css')) ?>">
 </head>
 <body class="app pg-<?= h($active) ?>">
 <script type="application/json" id="sk-data"><?= json_encode(['csrf' => csrf(), 'user' => $u['name'] ?? ''], JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
@@ -204,7 +204,7 @@ function page_end(array $opt = []): void
   <footer><button class="btn ghost" value="no">Cancel</button><button class="btn danger" value="yes">Delete</button></footer></form>
 </dialog>
 <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
-<script src="assets/admin.js?v=<?= h((string) @filemtime(__DIR__ . '/assets/admin.js')) ?>" defer></script>
+<script src="assets/hub.js?v=<?= h((string) @filemtime(__DIR__ . '/assets/hub.js')) ?>" defer></script>
 </body>
 </html>
 <?php

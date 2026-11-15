@@ -451,6 +451,12 @@
 
   /* ---------- installable app: register the service worker ---------- */
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
-    window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => reg.update()).catch(() => {});
+    });
+    /* when a newer version of the hub takes over, reload once so the new design shows */
+    let reloaded = false;
+    const hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController && !reloaded) { reloaded = true; location.reload(); } });
   }
 })();

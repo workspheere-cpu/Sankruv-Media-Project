@@ -14,3 +14,10 @@ AddType application/manifest+json .webmanifest
     Deny from all
   </IfModule>
 </FilesMatch>
+
+# The app script and pages must never be served from an old cache
+<IfModule mod_headers.c>
+  <FilesMatch "^(sw\.js|manifest\.webmanifest)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>
