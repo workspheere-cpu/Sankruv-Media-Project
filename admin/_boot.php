@@ -11,7 +11,7 @@ declare(strict_types=1);
 if (realpath((string) ($_SERVER['SCRIPT_FILENAME'] ?? '')) === __FILE__) { http_response_code(404); exit; }
 define('SK', 1);
 
-$CFG = ['brand' => 'Sankruv Media', 'app' => 'Client Hub', 'tz' => 'Asia/Kolkata', 'data_dir' => '', 'site_url' => '../index.html', 'setup_key' => ''];
+$CFG = ['brand' => 'Sankruv Media', 'app' => 'Client Hub', 'tz' => 'Asia/Kolkata', 'data_dir' => '', 'site_url' => '../index.html', 'setup_key' => '', 'reset_key' => ''];
 if (is_file(__DIR__ . '/config.php')) { $CFG = array_merge($CFG, (array) require __DIR__ . '/config.php'); }
 date_default_timezone_set($CFG['tz']);
 
@@ -212,7 +212,7 @@ function sk_gc_sessions(): void
 function valid_username(string $u): bool { return (bool) preg_match('/^[a-z0-9._-]{3,32}$/', $u); }
 function password_problem(string $p, string $confirm): ?string
 {
-    if (strlen($p) < 10) return 'Use at least 10 characters for the password.';
+    if (strlen($p) < 8) return 'Use at least 8 characters for the password.';
     if ($p !== $confirm) return 'The two passwords do not match.';
     return null;
 }

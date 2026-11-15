@@ -80,3 +80,5 @@ label small{font-weight:600;color:#b45309;display:none}label small.on{display:in
 @media (max-width:520px){.two{grid-template-columns:1fr}.card{padding:24px 20px 20px;border-radius:22px}body{overflow:auto}.wrap{height:auto;min-height:100dvh}}
 @media (max-height:700px){.pitch h1{font-size:40px}.feats{display:none}.card{padding:22px 24px 18px}.roles{display:none}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+.in select{width:100%;height:50px;padding:0 16px 0 44px;border:1.5px solid var(--line);border-radius:14px;font:500 15px Figtree,sans-serif;color:var(--ink);background:#f7fafa;appearance:none;-webkit-appearance:none}
+.in select:focus{outline:none;background:#fff;border-color:var(--p2);box-shadow:0 0 0 4px rgba(72,190,192,.18)}

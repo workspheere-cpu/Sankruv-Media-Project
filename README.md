@@ -100,8 +100,17 @@ writes that code to `setup-code.txt` in the hub's data folder: `sankruv-client-h
 `public_html` when the host allows it, otherwise `admin/data/`. Open the file with the hosting file
 manager, copy the code, and create the owner account. The file is deleted afterwards.
 
+**Forgotten password.** Put a long random `reset_key` in `admin/config.php` and open
+`/admin/reset.php?key=<that value>`. Pick the account, type a new password and you are signed in.
+The link works once; set a new key for another reset.
+
+**Install as an app.** On a phone, open the hub and choose "Add to Home screen" (Android) or
+Share, then "Add to Home Screen" (iPhone). It opens full screen with its own icon. The service worker
+caches only styles, scripts and icons, never pages or client data. The same manifest can be wrapped
+as an Android app later (for example with Bubblewrap or PWABuilder).
+
 **Data and safety.** The database, sessions and setup code live in the data folder, which is never
-committed (see `.gitignore`) and is blocked from the web. Sign-in uses hashed passwords, CSRF tokens,
+committed (see `.gitignore`) and is blocked from the web. Passwords need at least 8 characters. Sign-in uses hashed passwords, CSRF tokens,
 rate limits and a 10-minute lock after 5 wrong passwords. Sessions end after 8 idle hours. Pages send
 a strict Content Security Policy and `noindex`. Optional settings go in `admin/config.php`
 (copy `admin/config.sample.php`). Back up the data folder regularly.

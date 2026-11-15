@@ -553,3 +553,70 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
   .kpi em{display:block;margin:0}
   .kpi.alert::after{right:8px;top:8px}
 }
+
+/* ================= app shell for phones (installable, feels like a native app) ================= */
+.top-title,.me-m,.qa-row{display:none}
+.menu-h{padding:8px 12px 10px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.menu-h b{display:block;font-size:14px}
+.menu-h small{color:var(--mute);font-size:12px}
+.menu form{display:contents}
+html{-webkit-tap-highlight-color:transparent}
+@media (max-width:900px){
+  body{background:#f4f6f8}
+  .top{height:auto;min-height:58px;padding:calc(env(safe-area-inset-top) + 8px) 14px 8px;gap:10px;background:rgba(244,246,248,.86)}
+  .top-brand{display:block;padding:0;background:none;border-radius:11px;flex:none}
+  .top-brand img{width:34px;height:34px;border-radius:10px;box-shadow:0 4px 12px -6px rgba(11,14,24,.6)}
+  .top-title{display:block;flex:1;min-width:0;font-size:19px;font-weight:800;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .search{flex:none;width:40px;height:40px;padding:0;justify-content:center;border-radius:50%;border:0;box-shadow:none;background:#fff;color:var(--ink2)}
+  .search span,.search kbd{display:none}
+  .top-r{margin-left:0;gap:6px}
+  .me-m{display:block;position:relative}
+  .me-btn{display:grid;place-items:center;width:40px;height:40px;border-radius:50%}
+  .me-btn .av{width:34px;height:34px;font-size:12px}
+  .me-m .menu{right:0;min-width:230px}
+  .content{padding:2px 14px 24px;animation:pagein .35s var(--e) both}
+  @keyframes pagein{from{opacity:0;transform:translateY(8px)}}
+
+  /* dashboard */
+  .hello{margin:4px 0 12px;gap:6px}
+  .hello .eyebrow{font-size:12px}
+  .hello h1{font-size:22px}
+  .hello .lead{font-size:13.5px;margin-top:2px}
+  .hello-act{display:none}
+  .qa-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 14px}
+  .qa-row button{display:grid;justify-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--ink2)}
+  .qa-row span{width:52px;height:52px;border-radius:18px;display:grid;place-items:center;background:#fff;color:var(--teal);box-shadow:0 6px 16px -10px rgba(16,24,40,.35);transition:transform .2s var(--e),background .2s}
+  .qa-row button:first-child span{background:linear-gradient(180deg,#5ccdcf,#2fa9ab);color:#04191a}
+  .qa-row button:active span{transform:scale(.9)}
+  .qa-row svg{width:22px;height:22px}
+  .kpis{gap:8px;margin-bottom:12px}
+  .kpi,.panel,.ccard,.pcard,.kcard,.tl-b{border:0;box-shadow:0 1px 2px rgba(16,24,40,.04),0 6px 18px -12px rgba(16,24,40,.18)}
+  .kpi:active,.ccard:active,.nu:active,.dl-list a:active,.people li>a:active{transform:scale(.98)}
+  .panel{border-radius:18px}
+  .ph{margin-bottom:8px}
+  .ph h2{font-size:15px}
+  .rem{padding:10px 4px}
+  .rem-act{opacity:1}
+  .dl-list a{grid-template-columns:46px minmax(0,1fr) auto;gap:10px;padding:8px 4px}
+  .dl-date{width:46px;height:48px}
+
+  /* page headers become compact */
+  .page-h{margin:6px 0 14px;gap:10px}
+  .page-h h1{display:none}
+  .page-h .lead{font-size:13.5px}
+  .page-act .btn{height:44px}
+  .back{margin:2px 0 8px}
+
+  /* profile */
+  .gact span{width:48px;height:48px}
+
+  /* tab bar: frosted, safe-area aware, active pill */
+  .tabs-m{padding:6px 6px calc(8px + env(safe-area-inset-bottom));border-top:0;box-shadow:0 -10px 30px -18px rgba(16,24,40,.35);user-select:none;-webkit-user-select:none}
+  .tabs-m a{position:relative}
+  .tabs-m a svg{transition:transform .25s var(--e)}
+  .pg-dash .tabs-m a[href="index.php"]::before,.pg-clients .tabs-m a[href="clients.php"]::before,.pg-reminders .tabs-m a[href="reminders.php"]::before,.pg-projects .tabs-m a[href="projects.php"]::before{content:"";position:absolute;top:3px;left:50%;width:52px;height:30px;margin-left:-26px;border-radius:999px;background:var(--teal-bg);z-index:-1}
+  .tabs-m a:active svg{transform:scale(.85)}
+  .side-nav,.tabs-m,.ptabs,.seg{user-select:none;-webkit-user-select:none}
+  input,select,textarea{font-size:16px!important}
+}
+@media (display-mode:standalone){.top{padding-top:calc(env(safe-area-inset-top) + 10px)}}

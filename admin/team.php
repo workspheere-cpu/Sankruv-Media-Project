@@ -53,7 +53,7 @@ page_start('Team', 'team');
         <span class="u-act">
           <?= chip((int) $u['active'] ? 'Active' : 'Disabled', (int) $u['active'] ? 'ok' : 'mute') ?>
           <form method="post"><?= csrf_field() ?><input type="hidden" name="do" value="toggle"><input type="hidden" name="uid" value="<?= (int) $u['id'] ?>"><button class="btn ghost sm" type="submit"><?= (int) $u['active'] ? 'Disable' : 'Enable' ?></button></form>
-          <details class="reset"><summary class="btn ghost sm">New password</summary><form method="post" class="inline-f"><?= csrf_field() ?><input type="hidden" name="do" value="reset"><input type="hidden" name="uid" value="<?= (int) $u['id'] ?>"><input type="password" name="pass" minlength="10" required placeholder="At least 10 characters" autocomplete="new-password" aria-label="New password"><button class="btn pri sm" type="submit">Save</button></form></details>
+          <details class="reset"><summary class="btn ghost sm">New password</summary><form method="post" class="inline-f"><?= csrf_field() ?><input type="hidden" name="do" value="reset"><input type="hidden" name="uid" value="<?= (int) $u['id'] ?>"><input type="password" name="pass" minlength="8" required placeholder="At least 8 characters" autocomplete="new-password" aria-label="New password"><button class="btn pri sm" type="submit">Save</button></form></details>
         </span>
         <?php endif; ?>
       </li>
@@ -67,8 +67,8 @@ page_start('Team', 'team');
       <label class="fld">User ID<input name="username" required maxlength="32" pattern="[a-z0-9._\-]{3,32}" placeholder="for example: riya" autocapitalize="off" spellcheck="false"></label>
       <label class="fld">Email (optional)<input name="email" type="email" maxlength="120"></label>
       <label class="fld">Role<select name="role"><option value="member">Team member</option><option value="owner">Owner</option></select></label>
-      <label class="fld">Password<input name="pass" type="password" required minlength="10" autocomplete="new-password"></label>
-      <label class="fld">Repeat password<input name="pass2" type="password" required minlength="10" autocomplete="new-password"></label>
+      <label class="fld">Password<input name="pass" type="password" required minlength="8" autocomplete="new-password"></label>
+      <label class="fld">Repeat password<input name="pass2" type="password" required minlength="8" autocomplete="new-password"></label>
       <button class="btn pri" type="submit"><?= ic('check') ?>Create account</button>
     </form>
   </section>
@@ -77,8 +77,8 @@ page_start('Team', 'team');
     <header class="ph"><h2><?= ic('lock') ?>Change your password</h2></header>
     <form method="post" class="form-g"><?= csrf_field() ?><input type="hidden" name="do" value="password">
       <label class="fld">Current password<input name="current" type="password" required autocomplete="current-password"></label>
-      <label class="fld">New password<input name="new" type="password" required minlength="10" autocomplete="new-password"></label>
-      <label class="fld">Repeat new password<input name="new2" type="password" required minlength="10" autocomplete="new-password"></label>
+      <label class="fld">New password<input name="new" type="password" required minlength="8" autocomplete="new-password"></label>
+      <label class="fld">Repeat new password<input name="new2" type="password" required minlength="8" autocomplete="new-password"></label>
       <button class="btn pri" type="submit"><?= ic('check') ?>Change password</button>
     </form>
   </section>

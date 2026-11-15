@@ -15,4 +15,6 @@ return [
     // Optional private first-run link: setup.php?key=THIS_VALUE (at least 24 characters).
     // It works only until the owner account exists. Never put a real key in a public repository.
     'setup_key' => '',
+    // Optional one-time password reset link: reset.php?key=THIS_VALUE (at least 24 characters).
+    'reset_key' => '',
 ];

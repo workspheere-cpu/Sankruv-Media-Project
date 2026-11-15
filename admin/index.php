@@ -53,6 +53,13 @@ page_start('Dashboard', 'dash');
   </div>
 </section>
 
+<nav class="qa-row" aria-label="Quick add">
+  <button type="button" data-open="dlg-client"><span><?= ic('user') ?></span>Client</button>
+  <button type="button" data-open="dlg-reminder"><span><?= ic('bell') ?></span>Reminder</button>
+  <button type="button" data-open="dlg-project"><span><?= ic('layers') ?></span>Project</button>
+  <button type="button" data-open="dlg-payment"><span><?= ic('wallet') ?></span>Payment</button>
+</nav>
+
 <section class="kpis" aria-label="Summary">
   <a class="kpi" href="clients.php?status=active"><span class="k-i"><?= ic('users') ?></span><b data-count="<?= $k['active'] ?>"><?= $k['active'] ?></b><span>Active clients</span></a>
   <a class="kpi" href="clients.php?status=lead"><span class="k-i lead"><?= ic('spark') ?></span><b data-count="<?= $k['leads'] ?>"><?= $k['leads'] ?></b><span>Open leads<?php if ($k['leads7']): ?> <em class="up">+<?= $k['leads7'] ?> this week</em><?php endif; ?></span></a>

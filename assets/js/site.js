@@ -514,5 +514,74 @@
     if (reduce) { frame(0); addEventListener('scroll', function () { frame(0); }, { passive: true }); addEventListener('resize', function () { frame(0); }); }
     else requestAnimationFrame(frame);
   }
+  /* ---------- 11. phone extras: why-us cycle, auto-playing work reel, moving service chips ---------- */
+  (function () {
+  var mob = matchMedia('(max-width: 760px)').matches;
+  var inView = function (el, cb) {
+    if (!('IntersectionObserver' in window)) { cb(true); return; }
+    new IntersectionObserver(function (es) { es.forEach(function (e) { cb(e.isIntersecting); }); }, { threshold: 0.35 }).observe(el);
+  };
+  if (mob) {
+    $$('.reasons').forEach(function (ul) {
+      var lis = $$('li', ul); if (!lis.length) return;
+      var box = d.createElement('div'); box.className = 'why-detail'; box.setAttribute('aria-live', 'polite');
+      box.innerHTML = '<div><p><b></b><span></span></p></div>';
+      ul.parentNode.insertBefore(box, ul.nextSibling);
+      var i = -1, timer = 0, seen = false, hold = 0;
+      var show = function (n) {
+        lis.forEach(function (li, k) { li.classList.toggle('on', k === n); });
+        box.classList.remove('open');
+        setTimeout(function () {
+          $('b', box).textContent = $('h3', lis[n]).textContent;
+          $('span', box).textContent = $('p', lis[n]).textContent;
+          box.classList.add('open');
+        }, i < 0 ? 0 : 260);
+        i = n;
+      };
+      var tick = function () { if (seen && Date.now() > hold) show((i + 1) % lis.length); };
+      lis.forEach(function (li, k) {
+        li.tabIndex = 0;
+        li.addEventListener('click', function () { hold = Date.now() + 9000; show(k); });
+      });
+      inView(ul, function (v) { seen = v; if (v && i < 0) show(0); if (v && !timer && !reduce) timer = setInterval(tick, 2800); });
+    });
+
+    var reel = $('.hs-track');
+    if (reel) {
+      var cards = $$('.hs-item', reel), dots = d.createElement('div'), cur = 0, rHold = 0, rSeen = false;
+      dots.className = 'hs-dots'; dots.setAttribute('aria-hidden', 'true');
+      dots.innerHTML = cards.map(function () { return '<i></i>'; }).join('');
+      reel.parentNode.insertBefore(dots, reel.nextSibling);
+      var mark = function (n) {
+        cur = n;
+        cards.forEach(function (c, k) { c.classList.toggle('cur', k === n); });
+        $$('i', dots).forEach(function (t, k) { t.classList.toggle('on', k === n); });
+      };
+      mark(0);
+      reel.addEventListener('scroll', function () {
+        var w = cards[0].offsetWidth + 12;
+        var n = clamp(Math.round(reel.scrollLeft / w), 0, cards.length - 1);
+        if (n !== cur) mark(n);
+      }, { passive: true });
+      ['touchstart', 'pointerdown', 'wheel'].forEach(function (ev) { reel.addEventListener(ev, function () { rHold = Date.now() + 7000; }, { passive: true }); });
+      inView(reel, function (v) { rSeen = v; });
+      if (!reduce) setInterval(function () {
+        if (!rSeen || Date.now() < rHold || d.hidden) return;
+        var n = (cur + 1) % cards.length;
+        reel.scrollTo({ left: cards[n].offsetLeft - cards[0].offsetLeft, behavior: 'smooth' });
+      }, 3400);
+    }
+
+    if (!reduce) $$('.chapter .chips').forEach(function (ul) {
+      var orig = $$('li', ul); if (orig.length < 2) return;
+      orig.forEach(function (li) { var c = li.cloneNode(true); c.setAttribute('aria-hidden', 'true'); ul.appendChild(c); });
+      var w = $$('li', ul)[orig.length].offsetLeft - orig[0].offsetLeft;
+      ul.style.setProperty('--w', w + 'px');
+      ul.style.setProperty('--dur', Math.max(10, w / 32).toFixed(1) + 's');
+      ul.classList.add('marq-on');
+    });
+  }
+  })();
+
   try { scene3d(); } catch (e) { console.warn(e); }
 })();

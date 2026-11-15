@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <label for="e">Email (optional)</label>
       <div class="in"><?= ic('mail') ?><input id="e" name="email" type="email" value="<?= $val('email') ?>" autocomplete="email"></div>
       <div class="two">
-        <div><label for="p">Password</label><div class="in"><?= ic('lock') ?><input id="p" name="password" type="password" required autocomplete="new-password" placeholder="At least 10 characters"></div></div>
+        <div><label for="p">Password</label><div class="in"><?= ic('lock') ?><input id="p" name="password" type="password" required autocomplete="new-password" placeholder="At least 8 characters"></div></div>
         <div><label for="p2">Repeat password</label><div class="in"><?= ic('lock') ?><input id="p2" name="password2" type="password" required autocomplete="new-password"></div></div>
       </div>
       <button type="submit" class="go" id="go"><span class="sp" aria-hidden="true"></span><span class="t">Create account and open the hub <?= ic('arrow') ?></span></button>

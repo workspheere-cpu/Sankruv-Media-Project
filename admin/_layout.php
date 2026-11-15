@@ -24,7 +24,13 @@ function page_start(string $title, string $active, array $opt = []): void
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#0a0c15">
+<meta name="theme-color" content="#0b0e18">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Client Hub">
 <title><?= h($title) ?> | <?= h($CFG['brand']) ?> <?= h($CFG['app']) ?></title>
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -54,7 +60,8 @@ function page_start(string $title, string $active, array $opt = []): void
 
 <div class="main">
   <header class="top">
-    <a class="top-brand" href="index.php"><img src="../assets/img/logo.png" alt="<?= h($CFG['brand']) ?>" width="525" height="256"></a>
+    <a class="top-brand" href="index.php" aria-label="<?= h($CFG['brand']) ?> Client Hub home"><img src="assets/icons/icon-192.png" alt="" width="192" height="192"></a>
+    <span class="top-title"><?= h($active === 'dash' ? $CFG['app'] : $title) ?></span>
     <button class="search" type="button" data-open="palette" aria-label="Search clients and projects"><?= ic('search') ?><span>Search clients, projects, phone numbers</span><kbd>Ctrl K</kbd></button>
     <div class="top-r">
       <div class="quick">
@@ -67,6 +74,16 @@ function page_start(string $title, string $active, array $opt = []): void
         </div>
       </div>
       <span class="top-date"><?= ic('cal') ?><?= h(date('D, j M')) ?></span>
+      <div class="me-m">
+        <button class="me-btn" type="button" data-menu="me-menu" aria-label="Account"><span class="av sm" style="--h:<?= hue((string) ($u['name'] ?? '')) ?>"><?= h(initials((string) ($u['name'] ?? ''))) ?></span></button>
+        <div class="menu" id="me-menu" hidden>
+          <p class="menu-h"><b><?= h($u['name'] ?? '') ?></b><small><?= h($u['username'] ?? '') ?>, <?= ($u['role'] ?? '') === 'owner' ? 'Owner' : 'Team member' ?></small></p>
+          <a href="team.php"><?= ic('lock') ?><?= is_owner() ? 'Team and password' : 'Change password' ?></a>
+          <a href="payments.php"><?= ic('wallet') ?>Payments</a>
+          <a href="<?= h($CFG['site_url']) ?>" target="_blank" rel="noopener"><?= ic('globe') ?>View website</a>
+          <form method="post" action="logout.php"><?= csrf_field() ?><button type="submit"><?= ic('logout') ?>Sign out</button></form>
+        </div>
+      </div>
     </div>
   </header>
   <main class="content" id="content">

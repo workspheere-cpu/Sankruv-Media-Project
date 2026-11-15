@@ -65,3 +65,9 @@
   }
   requestAnimationFrame(frame);
 })();
+/* password reset: picking an account fills in its User ID */
+(function () {
+  var a = document.getElementById('acct'), u = document.getElementById('u');
+  if (!a || !u) return;
+  a.addEventListener('change', function () { var o = a.options[a.selectedIndex]; if (o && o.dataset.user) u.value = o.dataset.user; });
+})();
