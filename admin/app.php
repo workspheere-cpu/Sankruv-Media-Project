@@ -35,7 +35,7 @@ $v = fn(string $f) => (string) @filemtime(__DIR__ . '/assets/' . $f);
 </head>
 <body class="app js">
 <div id="hub"><div class="hub-boot"><img src="assets/icons/icon-192.png" alt="" width="72" height="72"><span></span></div></div>
-<noscript><p style="padding:24px">The Client Hub needs JavaScript. You can also use the <a href="index.php?classic=1">classic view</a>.</p></noscript>
+<noscript><p style="padding:24px">The Client Hub needs JavaScript. Please turn it on in your browser and reload this page.</p></noscript>
 <script type="application/json" id="hub-boot"><?= json_encode($boot, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
 <script src="assets/hubapp.js?v=<?= h($v('hubapp.js')) ?>" defer></script>
 </body>

@@ -1,4 +1,3 @@
-/* Generated from src/pages/_service.html by tools/html2jsx.py, then maintained here. */
 export const meta = {"template": "service landing page, filled once per entry in content/services.json"};
 
 export default function Page_Service({ t }) {

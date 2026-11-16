@@ -1,4 +1,3 @@
-/* Generated from src/pages/about.html by tools/html2jsx.py, then maintained here. */
 export const meta = {"title": "About Sankruv Media | Digital Marketing Agency in Mumbai", "description": "Sankruv Media is a Mumbai digital marketing agency with 5+ years of experience, 50+ satisfied clients, 25+ brands built and 700+ campaigns delivered.", "nav": "about", "schema": "crumb, about", "crumb": "About"};
 
 export default function PageAbout({ t }) {

@@ -1,4 +1,3 @@
-/* Generated from src/pages/contact.html by tools/html2jsx.py, then maintained here. */
 export const meta = {"title": "Contact Sankruv Media | Get a Free Quote in Mumbai", "description": "Talk to Sankruv Media about social media, websites, branding or shoots. WhatsApp us, call +91 866-873-8331, email contact@sankruvmedia.com or send a brief for a free quote.", "nav": "contact", "schema": "crumb, contact", "crumb": "Contact", "body": "is-contact"};
 
 export default function PageContact({ t }) {

@@ -77,9 +77,9 @@ switch ($in['action'] ?? '') {
         $rows = q("SELECT id, name, company, status, phone, email FROM clients WHERE name LIKE :l ESCAPE '\\' OR company LIKE :l ESCAPE '\\' OR email LIKE :l ESCAPE '\\' OR city LIKE :l ESCAPE '\\'"
             . ($dig !== '' && strlen($dig) >= 3 ? " OR replace(replace(replace(phone,' ',''),'-',''),'+','') LIKE :d OR replace(replace(replace(whatsapp,' ',''),'-',''),'+','') LIKE :d" : '')
             . " ORDER BY status = 'archived', name COLLATE NOCASE LIMIT 8", array_merge([':l' => $like], $dig !== '' && strlen($dig) >= 3 ? [':d' => '%' . $dig . '%'] : []))->fetchAll();
-        foreach ($rows as $r) $out[] = ['type' => 'Client', 'title' => $r['name'], 'sub' => trim(($r['company'] ?: '') . ' ' . SK_CLIENT_STATUS[$r['status']]), 'url' => 'client.php?id=' . $r['id'], 'init' => initials($r['name']), 'hue' => hue($r['name'])];
+        foreach ($rows as $r) $out[] = ['type' => 'Client', 'title' => $r['name'], 'sub' => trim(($r['company'] ?: '') . ' ' . SK_CLIENT_STATUS[$r['status']]), 'url' => 'client?id=' . $r['id'], 'init' => initials($r['name']), 'hue' => hue($r['name'])];
         $rows = q("SELECT p.id, p.title, p.due_date, p.client_id, c.name FROM projects p JOIN clients c ON c.id = p.client_id WHERE p.title LIKE ? ESCAPE '\\' ORDER BY p.due_date LIMIT 6", [$like])->fetchAll();
-        foreach ($rows as $r) $out[] = ['type' => 'Project', 'title' => $r['title'], 'sub' => $r['name'] . ($r['due_date'] ? ', due ' . fmt_date($r['due_date']) : ''), 'url' => 'client.php?id=' . $r['client_id'] . '#projects', 'init' => '', 'hue' => hue($r['name'])];
+        foreach ($rows as $r) $out[] = ['type' => 'Project', 'title' => $r['title'], 'sub' => $r['name'] . ($r['due_date'] ? ', due ' . fmt_date($r['due_date']) : ''), 'url' => 'client?id=' . $r['client_id'] . '#projects', 'init' => '', 'hue' => hue($r['name'])];
         json_out(['ok' => true, 'results' => $out]);
 
     /* ---------------- clients ---------------- */
@@ -94,7 +94,7 @@ switch ($in['action'] ?? '') {
             [$name, $s('company', 120), $s('industry', 60), $status, $s('phone', 30), $s('phone', 30), $email, $s('source', 60), $services, $me['id'], now(), now()]);
         $cid = (int) db()->lastInsertId();
         log_activity($cid, 'system', 'Client created by ' . $me['name']);
-        json_out(['ok' => true, 'id' => $cid, 'url' => 'client.php?id=' . $cid, 'message' => $name . ' added']);
+        json_out(['ok' => true, 'id' => $cid, 'url' => 'app.php#/client/' . $cid, 'message' => $name . ' added']);
 
     case 'client.update':
         need('clients', $id);
@@ -110,7 +110,7 @@ switch ($in['action'] ?? '') {
         $c = need('clients', $id);
         if (!is_owner()) bad('Only the owner can delete a client. You can archive it instead.');
         q('DELETE FROM clients WHERE id = ?', [$id]);
-        json_out(['ok' => true, 'url' => 'clients.php', 'message' => $c['name'] . ' deleted']);
+        json_out(['ok' => true, 'url' => 'app.php#/clients', 'message' => $c['name'] . ' deleted']);
 
     /* ---------------- projects ---------------- */
     case 'project.create':
@@ -124,7 +124,7 @@ switch ($in['action'] ?? '') {
         log_activity($cid, 'project', 'New project: ' . $title . ($s('due_date', 10) ? ', deadline ' . fmt_date($s('due_date', 10)) : ''));
         mail_auto('project_confirmed', $cid, $pid);
         q('UPDATE clients SET updated_at = ? WHERE id = ?', [now(), $cid]);
-        json_out(['ok' => true, 'url' => 'client.php?id=' . $cid . '#projects', 'message' => 'Project created']);
+        json_out(['ok' => true, 'url' => 'app.php#/client/' . $cid . '/projects', 'message' => 'Project created']);
 
     case 'project.update':
         $p = need('projects', $id);
@@ -203,7 +203,7 @@ switch ($in['action'] ?? '') {
         $payId = (int) db()->lastInsertId();
         log_activity($cid, 'payment', ($status === 'paid' ? 'Payment received: ' : 'Payment added: ') . $label . ', ' . inr($amount));
         if ($status === 'paid') mail_auto('payment_received', $cid, 0, $payId);
-        json_out(['ok' => true, 'url' => 'client.php?id=' . $cid . '#payments', 'message' => 'Payment saved']);
+        json_out(['ok' => true, 'url' => 'app.php#/client/' . $cid . '/payments', 'message' => 'Payment saved']);
 
     case 'payment.update':
         $p = need('payments', $id);

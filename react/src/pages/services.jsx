@@ -1,4 +1,3 @@
-/* Generated from src/pages/services.html by tools/html2jsx.py, then maintained here. */
 export const meta = {"title": "Digital Marketing Services in Mumbai | Sankruv Media", "description": "Social media management, website design and development, branding and creative design, and corporate and commercial shoots from one Mumbai team. See what each service includes.", "nav": "services", "schema": "crumb, services", "crumb": "Services"};
 
 export default function PageServices({ t }) {

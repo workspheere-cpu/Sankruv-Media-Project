@@ -3,7 +3,7 @@
   "short_name": "Client Hub",
   "description": "Clients, projects, reminders and payments for the Sankruv Media team.",
   "id": "./",
-  "start_url": "index.php?source=app",
+  "start_url": "app.php",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
@@ -16,8 +16,8 @@
     { "src": "assets/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "Clients", "url": "clients.php", "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }] },
-    { "name": "Reminders", "url": "reminders.php", "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }] },
-    { "name": "Projects", "url": "projects.php", "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }] }
+    { "name": "Clients", "url": "app.php#/clients", "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Reminders", "url": "app.php#/reminders", "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Projects", "url": "app.php#/projects", "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }] }
   ]
 }

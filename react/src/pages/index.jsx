@@ -1,4 +1,3 @@
-/* Generated from src/pages/index.html by tools/html2jsx.py, then maintained here. */
 export const meta = {"title": "Sankruv Media | Digital Marketing Agency in Mumbai", "description": "Sankruv Media is a digital marketing agency in Mumbai for social media management, website design and development, branding and corporate and commercial shoots. 50+ clients, 700+ campaigns.", "nav": "home", "schema": "faq_home", "body": "is-home"};
 
 export default function PageIndex({ t }) {

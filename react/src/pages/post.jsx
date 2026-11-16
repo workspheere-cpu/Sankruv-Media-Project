@@ -1,4 +1,3 @@
-/* Generated from src/pages/_post.html by tools/html2jsx.py, then maintained here. */
 export const meta = {"template": "blog article, filled once per file in content/blog"};
 
 export default function Page_Post({ t }) {

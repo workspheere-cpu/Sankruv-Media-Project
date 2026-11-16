@@ -1,4 +1,3 @@
-/* Generated from src/pages/404.html by tools/html2jsx.py, then maintained here. */
 export const meta = {"title": "Page Not Found | Sankruv Media", "description": "This page could not be found on the Sankruv Media website."};
 
 export default function PageNotFound({ t }) {

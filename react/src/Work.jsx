@@ -13,6 +13,11 @@ export const embed = v => v.src === 'youtube' ? `https://www.youtube-nocookie.co
 export const outside = v => v.src === 'youtube' ? `https://youtu.be/${v.id}` : v.src === 'drive' ? `https://drive.google.com/file/d/${v.id}/view`
   : v.src === 'folder' ? `https://drive.google.com/drive/folders/${v.id}` : v.url;
 
+let warmed = false;
+function warm() {
+  if (warmed) return; warmed = true;
+  ['https://drive.google.com', 'https://www.youtube-nocookie.com', 'https://i.ytimg.com', 'https://lh3.googleusercontent.com'].forEach(h => { const l = document.createElement('link'); l.rel = 'preconnect'; l.href = h; document.head.appendChild(l); });
+}
 function Card({ v, i, onOpen }) {
   const [noImg, setNoImg] = useState(!thumb(v));
   const ref = useRef(null);
@@ -35,7 +40,7 @@ function Card({ v, i, onOpen }) {
       <span className="vc-cap"><b>{v.title}</b><small>{v.kind}</small></span>
     </>
   );
-  const common = { ref, className: 'vcard' + (noImg ? ' no-img' : '') + (v.vertical ? ' tall' : ''), style: { '--i': i % 12, '--h': HUE[v.cat] }, onPointerMove: move, onPointerLeave: leave };
+  const common = { ref, className: 'vcard' + (noImg ? ' no-img' : '') + (v.vertical ? ' tall' : ''), style: { '--i': i % 12, '--h': HUE[v.cat] }, onPointerMove: move, onPointerLeave: leave, onPointerEnter: warm, onFocus: warm };
   return v.src === 'link'
     ? <a {...common} href={v.url} target="_blank" rel="noopener" aria-label={`${v.title}, ${v.kind}. Opens Instagram`}>{body}</a>
     : <button {...common} type="button" onClick={() => onOpen(v)} aria-label={`Play ${v.title}, ${v.kind}`}>{body}</button>;
@@ -44,7 +49,9 @@ function Card({ v, i, onOpen }) {
 function Player({ list, v, onClose, onGo }) {
   const box = useRef(null);
   const { root } = useSite();
+  const [ready, setReady] = useState(false);
   const i = list.indexOf(v);
+  useEffect(() => { setReady(false); const t = setTimeout(() => setReady(true), 9000); return () => clearTimeout(t); }, [v]);
   useEffect(() => {
     const prev = document.activeElement;
     const key = e => { if (e.key === 'Escape') onClose(); if (e.key === 'ArrowRight') onGo(1); if (e.key === 'ArrowLeft') onGo(-1); };
@@ -55,12 +62,16 @@ function Player({ list, v, onClose, onGo }) {
   }, [onClose, onGo]);
   return (
     <div className="vplayer" role="dialog" aria-modal="true" aria-label={v.title} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className={'vp-box' + (v.vertical ? ' tall' : '') + (v.src === 'folder' ? ' folder' : '')} ref={box} tabIndex={-1}>
-        <div className="vp-frame"><iframe key={v.id} src={embed(v)} title={v.title} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" referrerPolicy="strict-origin-when-cross-origin"></iframe></div>
+      <div className="vp-box" ref={box} tabIndex={-1}>
+        {/* one stage for every film: always 16:9 and sized to fit the screen; vertical films sit centred inside it */}
+        <div className={'vp-frame' + (ready ? ' ready' : '') + (v.vertical ? ' tall' : '') + (v.src === 'folder' ? ' folder' : '')} style={{ '--h': HUE[v.cat] }}>
+          {thumb(v) && <img className="vp-poster" src={thumb(v)} alt="" referrerPolicy="no-referrer" onError={e => { e.target.style.display = 'none'; }} />}
+          <div className="vp-load" aria-hidden={ready}><span></span><b>Loading {v.title}</b></div>
+          <div className="vp-clip"><iframe key={v.id} src={embed(v)} title={v.title} onLoad={() => setReady(true)} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" referrerPolicy="strict-origin-when-cross-origin"></iframe>{v.src === 'drive' && <i className="vp-guard" aria-hidden="true"></i>}</div>
+        </div>
         <div className="vp-bar">
           <span className="vp-t"><b>{v.title}</b><small>{v.kind}, {i + 1} of {list.length}</small></span>
           <a className="btn hot sm vp-cta" href={`${root}contact.html?service=shoots`}><span>Get a film like this</span><Arrow /></a>
-          <a className="vp-out" href={outside(v)} target="_blank" rel="noopener">Open{v.src === 'youtube' ? ' on YouTube' : ' in Drive'}<Arrow /></a>
           <button className="vp-nav prev" type="button" onClick={() => onGo(-1)} aria-label="Previous film"><Arrow /></button>
           <button className="vp-nav next" type="button" onClick={() => onGo(1)} aria-label="Next film"><Arrow /></button>
         </div>
@@ -107,7 +118,7 @@ export function VideoWall() {
         <div className="vfilter" role="group" aria-label="Filter films by type">
           {CATS.map(([k, label]) => <button type="button" key={k} className={k === cat ? 'on' : ''} aria-pressed={k === cat} onClick={() => setCat(k)}>{label}<small>{k === 'all' ? VIDEOS.length : VIDEOS.filter(v => v.cat === k).length}</small></button>)}
         </div>
-        <div className={'vwall' + (cat === 'all' ? ' lead' : '')} key={cat}>
+        <div className="vwall" key={cat}>
           {list.map((v, i) => <Card v={v} i={i} onOpen={open} key={v.title} />)}
           <a className="vcta" href={`${root}contact.html?service=shoots`} style={{ '--i': list.length % 12 }}>
             <span className="d">Your film could be next</span><span>Tell us the idea. We plan, shoot and edit it, and send a free quote.</span>

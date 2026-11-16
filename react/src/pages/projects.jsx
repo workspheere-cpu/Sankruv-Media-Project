@@ -1,4 +1,3 @@
-/* Generated from src/pages/projects.html by tools/html2jsx.py, then maintained here. */
 export const meta = {"title": "Our Work: Films, Ad Shoots and Campaigns | Sankruv Media", "description": "Watch commercials, brand shoots, music videos, wedding films and reels by Sankruv Media, Mumbai, for brands including Havmor, Lakme Fashion Week and Sunburn. See the work, then get a free quote.", "nav": "work", "schema": "crumb, projects", "crumb": "Work"};
 
 export default function PageProjects({ t }) {

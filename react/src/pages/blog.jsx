@@ -1,4 +1,3 @@
-/* Generated from src/pages/blog.html by tools/html2jsx.py, then maintained here. */
 export const meta = {"title": "Digital Marketing Blog: Social Media, Video and Branding Tips | Sankruv Media", "description": "Practical articles from Sankruv Media on social media, video marketing, video editing, websites and brand strategy for growing businesses in India.", "nav": "blog", "schema": "crumb, blog", "crumb": "Blog", "body": "is-blog"};
 
 export default function PageBlog({ t }) {
